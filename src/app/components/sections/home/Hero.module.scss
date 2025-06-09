@@ -1,0 +1,143 @@
+@use 'sass:color';
+@use '@/styles/variables' as *;
+
+.hero {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  
+  &__background {
+    position: absolute;
+    inset: 0;
+    z-index: $z-index-dropdown;
+  }
+  
+  &__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: $z-index-dropdown;
+  }
+  
+  &__content {
+    position: relative;
+    z-index: $z-index-sticky;
+    text-align: center;
+    padding: 0 $spacing-md;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  &__title {
+    font-size: $font-size-3xl;
+    font-weight: 700;
+    color: $light-color;
+    margin-bottom: $spacing-lg;
+    
+    @media (min-width: $breakpoint-md) {
+      font-size: $font-size-4xl;
+    }
+  }
+  
+  &__title_accent {
+    color: $primary-color;
+  }
+  
+  &__description {
+    font-size: $font-size-md;
+    color: $light-color;
+    margin-bottom: $spacing-xl;
+    max-width: 48rem;
+    margin-left: auto;
+    margin-right: auto;
+    
+    @media (min-width: $breakpoint-md) {
+      font-size: $font-size-lg;
+    }
+  }
+  
+  &__buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: $spacing-md;
+    margin-top: $spacing-xl;
+    
+    @media (min-width: $breakpoint-sm) {
+      flex-direction: row;
+    }
+  }
+  
+  &__button_primary {
+    padding: $spacing-sm $spacing-xl;
+    background-color: $primary-color;
+    color: $light-color;
+    border-radius: $border-radius-md;
+    font-weight: 600;
+    font-size: $font-size-md;
+    cursor: pointer;
+    transition: $transition-base;
+    
+    &:hover {
+      background-color: color.adjust($primary-color, $lightness: -10%);
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
+    }
+  }
+  
+  &__button_secondary {
+    padding: $spacing-sm $spacing-xl;
+    background-color: transparent;
+    color: $light-color;
+    border: 2px solid $light-color;
+    border-radius: $border-radius-md;
+    font-weight: 600;
+    font-size: $font-size-md;
+    cursor: pointer;
+    transition: $transition-base;
+    
+    &:hover {
+      background-color: $light-color;
+      color: $dark-color;
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
+    }
+  }
+  
+  &__scroll {
+    position: absolute;
+    bottom: $spacing-xl;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: $z-index-sticky;
+    cursor: pointer;
+  }
+  
+  &__scroll_icon {
+    animation: bounce 2s infinite;
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+} 

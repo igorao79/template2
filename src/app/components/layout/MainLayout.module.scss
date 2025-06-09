@@ -1,0 +1,9 @@
+@use 'sass:color';
+@use '@/styles/variables' as *;
+
+.main {
+  min-height: 100vh;
+  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+} 

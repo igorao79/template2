@@ -1,0 +1,118 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import { FaTicketAlt, FaCheck } from 'react-icons/fa';
+import styles from './TicketCards.module.scss';
+
+const tickets = [
+  {
+    id: 1,
+    type: 'Взрослый',
+    price: 500,
+    description: 'Для посетителей старше 14 лет',
+    features: ['Полный доступ ко всем экспозициям', 'Возможность посещения шоу животных', 'Карта зоопарка']
+  },
+  {
+    id: 2,
+    type: 'Детский',
+    price: 300,
+    description: 'Для детей от 3 до 14 лет',
+    features: ['Полный доступ ко всем экспозициям', 'Возможность посещения шоу животных', 'Карта зоопарка', 'Доступ к детским площадкам']
+  },
+  {
+    id: 3,
+    type: 'Семейный',
+    price: 1200,
+    description: '2 взрослых + 2 ребенка',
+    features: ['Полный доступ ко всем экспозициям', 'Возможность посещения шоу животных', 'Карта зоопарка', 'Скидка 15% в кафе зоопарка']
+  },
+  {
+    id: 4,
+    type: 'Льготный',
+    price: 250,
+    description: 'Пенсионеры, ветераны, инвалиды',
+    features: ['Полный доступ ко всем экспозициям', 'Возможность посещения шоу животных', 'Карта зоопарка', 'Помощь сопровождающего']
+  }
+];
+
+const TicketCards = () => {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
+
+  return (
+    <section className={styles.tickets} id="tickets">
+      <div className={styles.tickets__container}>
+        <motion.div 
+          className={styles.tickets__header}
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <h2 className={styles.tickets__title}>Билеты в зоопарк</h2>
+          <p className={styles.tickets__description}>
+            Выберите подходящий вариант билета для посещения нашего зоопарка. Дети до 3 лет могут посетить зоопарк бесплатно.
+          </p>
+        </motion.div>
+
+        <motion.div 
+          className={styles.tickets__grid}
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          {tickets.map((ticket) => (
+            <motion.div 
+              key={ticket.id}
+              className={styles.tickets__card}
+              variants={cardVariants}
+              whileHover={{ y: -10, transition: { duration: 0.2 } }}
+            >
+              <div className={styles.tickets__card_header}>
+                <FaTicketAlt className={styles.tickets__icon} />
+                <h3 className={styles.tickets__type}>{ticket.type}</h3>
+                <p className={styles.tickets__price}>{ticket.price} ₽</p>
+                <p className={styles.tickets__description}>{ticket.description}</p>
+              </div>
+              
+              <div className={styles.tickets__features}>
+                <ul className={styles.tickets__list}>
+                  {ticket.features.map((feature, index) => (
+                    <li key={index} className={styles.tickets__item}>
+                      <FaCheck className={styles.tickets__check} />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <button className={styles.tickets__button}>
+                Купить билет
+              </button>
+            </motion.div>
+          ))}
+        </motion.div>
+        
+        <div className={styles.tickets__note}>
+          <p>Приобретая билеты онлайн, вы можете избежать очередей в кассе и получить скидку 5%.</p>
+          <p>Билеты также можно приобрести в кассах зоопарка, которые работают ежедневно с 9:00 до 19:00.</p>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default TicketCards; 
