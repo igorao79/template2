@@ -1,9 +1,21 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { FaMapMarkerAlt, FaBus, FaSubway, FaCar, FaPhone, FaClock, FaEnvelope } from 'react-icons/fa';
-import Image from 'next/image';
 import styles from './LocationMap.module.scss';
+
+// Определяем тип для Leaflet, который будет доступен глобально
+declare global {
+  interface Window {
+    L: any;
+  }
+}
+
+// Расширяем HTMLDivElement для поддержки Leaflet
+interface LeafletElement extends HTMLDivElement {
+  _leaflet_id?: number;
+}
 
 const transportOptions = [
   {
@@ -27,6 +39,80 @@ const transportOptions = [
 ];
 
 const LocationMap = () => {
+  const mapRef = useRef<HTMLDivElement | null>(null);
+  const mapInitialized = useRef<boolean>(false);
+
+  useEffect(() => {
+    // Проверяем, что карта еще не инициализирована
+    if (mapInitialized.current) {
+      console.log('Map already initialized, skipping');
+      return;
+    }
+    
+    // Добавляем скрипт OpenStreetMap на страницу
+    const scriptId = 'leaflet-script';
+    const linkId = 'leaflet-css';
+    let script = document.getElementById(scriptId) as HTMLScriptElement;
+    let link = document.getElementById(linkId) as HTMLLinkElement;
+    
+    // Проверяем, есть ли уже скрипт и стили на странице
+    if (!script) {
+      script = document.createElement('script');
+      script.id = scriptId;
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+      script.crossOrigin = '';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+    
+    if (!link) {
+      link = document.createElement('link');
+      link.id = linkId;
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+      link.crossOrigin = '';
+      document.head.appendChild(link);
+    }
+    
+    // Инициализируем карту после загрузки скрипта
+    const initMap = () => {
+      if (mapRef.current && window.L && !mapInitialized.current) {
+        // Координаты зоопарка (пример, замените на реальные)
+        const zooLatitude = 55.7558;
+        const zooLongitude = 37.6173;
+        
+        // Создаем карту
+        const map = window.L.map(mapRef.current).setView([zooLatitude, zooLongitude], 15);
+        
+        // Добавляем тайлы OpenStreetMap
+        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Добавляем маркер зоопарка
+        const zooMarker = window.L.marker([zooLatitude, zooLongitude]).addTo(map);
+        zooMarker.bindPopup("<b>Наш зоопарк</b><br>Добро пожаловать!").openPopup();
+        
+        // Помечаем карту как инициализированную
+        mapInitialized.current = true;
+      }
+    };
+    
+    if (window.L) {
+      // Если Leaflet уже загружен, сразу инициализируем карту
+      initMap();
+    } else if (script) {
+      // Иначе ждем загрузки скрипта
+      script.onload = initMap;
+    }
+    
+    // Не удаляем скрипты и стили при размонтировании, 
+    // так как они могут использоваться повторно
+    return () => {};
+  }, []);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -61,19 +147,7 @@ const LocationMap = () => {
 
         <div className={styles.location__content}>
           <div className={styles.location__map_container}>
-            <div className={styles.location__map}>
-              <Image 
-                src="/images/zoo-map.webp"
-                alt="Карта местоположения зоопарка"
-                width={1200}
-                height={800}
-                className={styles.location__map_image}
-                quality={90}
-              />
-              <div className={styles.location__map_marker}>
-                <FaMapMarkerAlt />
-              </div>
-            </div>
+            <div ref={mapRef} className={styles.location__map}></div>
             
             <div className={styles.location__address}>
               <h3>Наш адрес</h3>

@@ -55,6 +55,14 @@
     height: 400px;
     position: relative;
     overflow: hidden;
+    width: 100%;
+    z-index: 1;
+    
+    .leaflet-container {
+      height: 100%;
+      width: 100%;
+      border-radius: 8px;
+    }
   }
   
   &__map_marker {
@@ -172,13 +180,6 @@
     &:last-child {
       margin-bottom: 0;
     }
-  }
-  
-  &__map_image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 8px;
   }
 }
 

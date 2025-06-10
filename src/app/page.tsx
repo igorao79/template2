@@ -1,32 +1,42 @@
 'use client';
 
 import { useEffect } from 'react';
-import { usePathname } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import MainLayout from './components/layout/MainLayout';
 import Hero from './components/sections/home/Hero';
 import AnimalGallery from './components/sections/animals/AnimalGallery';
 import AnimalSoundsGame from './components/sections/interactive/AnimalSoundsGame';
-import AnimationShowcase from './components/sections/interactive/AnimationShowcase';
 import TicketCards from './components/sections/tickets/TicketCards';
 import LocationMap from './components/sections/location/LocationMap';
 import EventsCalendar from './components/sections/events/EventsCalendar';
+import { usePathname } from 'next/navigation';
 
 export default function Home() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Обработка роутинга при загрузке страницы
-    if (pathname && pathname !== '/') {
-      const sectionId = pathname.replace('/', '');
-      const section = document.getElementById(sectionId);
-      if (section) {
-        // Небольшая задержка для корректной прокрутки после полной загрузки компонентов
-        setTimeout(() => {
-          section.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
+    // Проверяем есть ли сохраненная секция в sessionStorage
+    const savedSection = typeof window !== 'undefined' 
+      ? sessionStorage.getItem('lastVisitedSection')
+      : null;
+    
+    // Прокручиваем к нужной секции при загрузке страницы
+    setTimeout(() => {
+      // Если есть сохраненная секция, используем ее
+      let section = '';
+      if (savedSection) {
+        section = savedSection;
+        sessionStorage.removeItem('lastVisitedSection'); // Удаляем после использования
+      } else {
+        section = pathname.replace('/', '');
       }
-    }
+      
+      if (section && section !== '') {
+        const element = document.getElementById(section);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }, 100); // Небольшая задержка для уверенности, что DOM загружен
   }, [pathname]);
 
   return (
@@ -34,7 +44,6 @@ export default function Home() {
       <Hero />
       <div id="animals">
         <AnimalGallery />
-        <AnimationShowcase />
         <AnimalSoundsGame />
       </div>
       <div id="tickets">

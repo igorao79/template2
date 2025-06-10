@@ -1,8 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { FaTicketAlt, FaCheck } from 'react-icons/fa';
+import { FaTicketAlt, FaCheck, FaUser, FaChild, FaUsers, FaUserTie } from 'react-icons/fa';
 import styles from './TicketCards.module.scss';
+import { useCart } from '@/app/context/CartContext';
 
 const tickets = [
   {
@@ -21,13 +22,6 @@ const tickets = [
   },
   {
     id: 3,
-    type: 'Семейный',
-    price: 1200,
-    description: '2 взрослых + 2 ребенка',
-    features: ['Полный доступ ко всем экспозициям', 'Возможность посещения шоу животных', 'Карта зоопарка', 'Скидка 15% в кафе зоопарка']
-  },
-  {
-    id: 4,
     type: 'Льготный',
     price: 250,
     description: 'Пенсионеры, ветераны, инвалиды',
@@ -35,7 +29,23 @@ const tickets = [
   }
 ];
 
+const getTicketTypeForCart = (type: string): 'adult' | 'child' | 'family' | 'senior' => {
+  if (type.includes('Взрослый')) return 'adult';
+  if (type.includes('Детский')) return 'child';
+  if (type.includes('Льготный')) return 'senior';
+  return 'adult';
+};
+
+const getTicketIcon = (type: string) => {
+  if (type.includes('Взрослый')) return <FaUser />;
+  if (type.includes('Детский')) return <FaChild />;
+  if (type.includes('Льготный')) return <FaUserTie />;
+  return <FaTicketAlt />;
+};
+
 const TicketCards = () => {
+  const { addToCart } = useCart();
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -49,6 +59,21 @@ const TicketCards = () => {
   const cardVariants = {
     hidden: { opacity: 0, y: 50 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
+
+  const handleBuyTicket = (ticket: typeof tickets[0]) => {
+    console.log('TicketCards: Добавление билета в корзину:', ticket.type);
+    const cartTicket = {
+      id: ticket.id,
+      name: ticket.type,
+      price: ticket.price,
+      description: ticket.description,
+      type: getTicketTypeForCart(ticket.type),
+      icon: getTicketIcon(ticket.type)
+    };
+    
+    console.log('TicketCards: Данные билета для корзины:', cartTicket);
+    addToCart(cartTicket, 1);
   };
 
   return (
@@ -82,7 +107,7 @@ const TicketCards = () => {
               whileHover={{ y: -10, transition: { duration: 0.2 } }}
             >
               <div className={styles.tickets__card_header}>
-                <FaTicketAlt className={styles.tickets__icon} />
+                {getTicketIcon(ticket.type)}
                 <h3 className={styles.tickets__type}>{ticket.type}</h3>
                 <p className={styles.tickets__price}>{ticket.price} ₽</p>
                 <p className={styles.tickets__description}>{ticket.description}</p>
@@ -99,7 +124,10 @@ const TicketCards = () => {
                 </ul>
               </div>
               
-              <button className={styles.tickets__button}>
+              <button 
+                className={styles.tickets__button}
+                onClick={() => handleBuyTicket(ticket)}
+              >
                 Купить билет
               </button>
             </motion.div>

@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaBars, FaTimes } from 'react-icons/fa';
+import { FaBars, FaTimes, FaShoppingCart } from 'react-icons/fa';
 import styles from './Header.module.scss';
 import { useRouter, usePathname } from 'next/navigation';
+import { useCart } from '@/app/context/CartContext';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -12,6 +13,7 @@ const Header = () => {
   const [activeSection, setActiveSection] = useState('home');
   const router = useRouter();
   const pathname = usePathname();
+  const { openCart, totalQuantity } = useCart();
 
   useEffect(() => {
     // Установка активной секции на основе текущего URL при загрузке страницы
@@ -22,7 +24,14 @@ const Header = () => {
     const initialScroll = window.scrollY > 50;
     setIsScrolled(initialScroll);
 
+    // Функция для обновления URL без перезагрузки страницы
+    const updateUrl = (section: string) => {
+      const newPath = section === 'home' || section === '' ? '/' : `/${section}`;
+      window.history.replaceState({}, '', newPath);
+    };
+
     const handleScroll = () => {
+      // Обновляем состояние скролла для изменения фона хедера
       setIsScrolled(window.scrollY > 50);
       
       // Определяем активную секцию на основе скролла
@@ -34,6 +43,7 @@ const Header = () => {
         return;
       }
       
+      // Проходим по секциям снизу вверх, чтобы найти ту, которая сейчас видна
       for (const section of sections.reverse()) {
         const el = document.getElementById(section);
         if (el) {
@@ -51,10 +61,25 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [pathname]);
 
-  // Функция для обновления URL без перезагрузки страницы
-  const updateUrl = (section: string) => {
-    const newPath = section === 'home' || section === '' ? '/' : `/${section}`;
-    window.history.replaceState({}, '', newPath);
+  const scrollToSection = (e: React.MouseEvent, sectionId: string) => {
+    e.preventDefault();
+    
+    if (sectionId === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setActiveSection('home');
+      window.history.replaceState({}, '', '/');
+    } else {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+        setActiveSection(sectionId);
+        window.history.replaceState({}, '', `/${sectionId}`);
+      }
+    }
+    
+    if (mobileMenuOpen) {
+      setMobileMenuOpen(false);
+    }
   };
 
   const navLinks = [
@@ -79,27 +104,6 @@ const Header = () => {
   const itemVariants = {
     hidden: { opacity: 0, y: -10 },
     visible: { opacity: 1, y: 0 },
-  };
-
-  const scrollToSection = (e: React.MouseEvent, sectionId: string) => {
-    e.preventDefault();
-    
-    if (sectionId === 'home') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      setActiveSection('home');
-      updateUrl('');
-    } else {
-      const section = document.getElementById(sectionId);
-      if (section) {
-        section.scrollIntoView({ behavior: 'smooth' });
-        setActiveSection(sectionId);
-        updateUrl(sectionId);
-      }
-    }
-    
-    if (mobileMenuOpen) {
-      setMobileMenuOpen(false);
-    }
   };
 
   return (
@@ -151,18 +155,37 @@ const Header = () => {
           </ul>
         </motion.nav>
 
-        {/* Mobile Menu Button */}
-        <button 
-          className={styles['header__mobile-button']}
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Открыть меню"
-        >
-          {mobileMenuOpen ? (
-            <FaTimes />
-          ) : (
-            <FaBars />
-          )}
-        </button>
+        {/* Mobile Controls */}
+        <div className={styles.header__mobile_controls}>
+          {/* Cart Button */}
+          <motion.button 
+            className={styles.header__cart}
+            onClick={openCart}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <FaShoppingCart />
+            {totalQuantity > 0 && (
+              <span className={styles.header__cart_badge}>{totalQuantity}</span>
+            )}
+          </motion.button>
+
+          {/* Mobile Menu Button */}
+          <button 
+            className={styles['header__mobile-button']}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Открыть меню"
+          >
+            {mobileMenuOpen ? (
+              <FaTimes />
+            ) : (
+              <FaBars />
+            )}
+          </button>
+        </div>
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
@@ -192,6 +215,25 @@ const Header = () => {
                   </a>
                 </motion.li>
               ))}
+              <motion.li
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.3 }}
+              >
+                <button 
+                  className={styles.header__mobile_cart_btn}
+                  onClick={() => {
+                    openCart();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <FaShoppingCart className={styles.header__mobile_cart_icon} />
+                  Корзина
+                  {totalQuantity > 0 && (
+                    <span className={styles.header__mobile_cart_badge}>{totalQuantity}</span>
+                  )}
+                </button>
+              </motion.li>
             </ul>
           </motion.div>
         )}

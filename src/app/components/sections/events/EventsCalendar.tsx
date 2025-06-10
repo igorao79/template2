@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaTicketAlt, FaChevronRight } from 'react-icons/fa';
+import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaTicketAlt, FaChevronRight, FaShoppingCart } from 'react-icons/fa';
 import Image from 'next/image';
 import styles from './EventsCalendar.module.scss';
+import { useCart } from '@/app/context/CartContext';
 
 const events = [
   {
@@ -15,7 +16,9 @@ const events = [
     time: '12:00',
     location: 'Павильон хищников',
     image: '/images/feeding-lions.webp',
-    category: 'feeding'
+    category: 'feeding',
+    price: 300,
+    ticketType: 'event'
   },
   {
     id: 2,
@@ -25,7 +28,9 @@ const events = [
     time: '14:00',
     location: 'Дельфинарий',
     image: '/images/dolphin-show.webp',
-    category: 'show'
+    category: 'show',
+    price: 500,
+    ticketType: 'event'
   },
   {
     id: 3,
@@ -35,7 +40,9 @@ const events = [
     time: '15:30',
     location: 'Образовательный центр',
     image: '/images/reptile-lecture.webp',
-    category: 'lecture'
+    category: 'lecture',
+    price: 200,
+    ticketType: 'event'
   },
   {
     id: 4,
@@ -45,7 +52,9 @@ const events = [
     time: '10:00 - 18:00',
     location: 'Детская зона',
     image: '/images/petting-zoo.webp',
-    category: 'activity'
+    category: 'activity',
+    price: 400,
+    ticketType: 'event'
   },
   {
     id: 5,
@@ -55,7 +64,9 @@ const events = [
     time: '21:00',
     location: 'Главный вход',
     image: '/images/night-zoo.webp',
-    category: 'special'
+    category: 'special',
+    price: 800,
+    ticketType: 'event'
   }
 ];
 
@@ -69,7 +80,9 @@ const categories = [
 ];
 
 const EventsCalendar = () => {
+  const { addToCart } = useCart();
   const [activeCategory, setActiveCategory] = useState('all');
+  const [addedToCart, setAddedToCart] = useState<Record<number, boolean>>({});
 
   const filteredEvents = activeCategory === 'all' 
     ? events 
@@ -88,6 +101,31 @@ const EventsCalendar = () => {
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
+  
+  const handleScrollToTickets = () => {
+    const ticketsSection = document.getElementById('tickets');
+    if (ticketsSection) {
+      ticketsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleAddToCart = (event: typeof events[0]) => {
+    addToCart({
+      id: event.id + 1000, // Уникальный ID для событий
+      name: `Билет на: ${event.title}`,
+      price: event.price,
+      description: `${new Date(event.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}, ${event.time}`,
+      type: 'event' as 'adult' | 'child' | 'family' | 'senior', // Тип для билетов на события
+      icon: '🎫'
+    }, 1);
+
+    setAddedToCart(prev => ({ ...prev, [event.id]: true }));
+    
+    // Сбросить статус "добавлено в корзину" через 3 секунды
+    setTimeout(() => {
+      setAddedToCart(prev => ({ ...prev, [event.id]: false }));
+    }, 3000);
   };
 
   return (
@@ -142,6 +180,9 @@ const EventsCalendar = () => {
                   quality={80}
                 />
                 <div className={styles.events__overlay}></div>
+                <div className={styles.events__badge}>
+                  {event.price} ₽
+                </div>
               </div>
               
               <div className={styles.events__content}>
@@ -166,15 +207,35 @@ const EventsCalendar = () => {
                 </div>
                 
                 <div className={styles.events__actions}>
-                  <button className={styles.events__ticket_button}>
-                    <FaTicketAlt />
-                    <span>Купить билет</span>
-                  </button>
+                  <motion.button 
+                    className={`${styles.events__ticket_button} ${addedToCart[event.id] ? styles.events__ticket_button_added : ''}`}
+                    onClick={() => handleAddToCart(event)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    disabled={addedToCart[event.id]}
+                  >
+                    {addedToCart[event.id] ? (
+                      <>
+                        <FaShoppingCart />
+                        <span>Добавлено</span>
+                      </>
+                    ) : (
+                      <>
+                        <FaTicketAlt />
+                        <span>Купить билет</span>
+                      </>
+                    )}
+                  </motion.button>
                   
-                  <button className={styles.events__more_button}>
-                    <span>Подробнее</span>
+                  <motion.button 
+                    className={styles.events__more_button}
+                    onClick={handleScrollToTickets}
+                    whileHover={{ x: 5 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <span>Перейти к билетам</span>
                     <FaChevronRight />
-                  </button>
+                  </motion.button>
                 </div>
               </div>
             </motion.div>

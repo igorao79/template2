@@ -84,6 +84,8 @@
     position: relative;
     height: 200px;
     overflow: hidden;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
   }
   
   &__image {
@@ -99,7 +101,21 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.4));
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.6));
+  }
+  
+  &__badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: $secondary-color;
+    color: $text-color-primary;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    z-index: 2;
+    font-size: 1rem;
   }
   
   &__content {
@@ -150,27 +166,26 @@
   }
   
   &__ticket_button {
-    flex: 1;
+    background-color: $primary-color;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 0.9rem;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: $spacing-xs;
-    padding: $spacing-sm;
-    background-color: $primary-color;
-    color: $light-color;
-    border: none;
-    border-radius: $border-radius-sm;
-    font-weight: 600;
-    font-size: $font-size-sm;
+    gap: 8px;
     cursor: pointer;
-    transition: $transition-base;
+    transition: all 0.3s ease;
     
     &:hover {
       background-color: color.adjust($primary-color, $lightness: -10%);
     }
-    
-    svg {
-      font-size: $font-size-base;
+
+    &_added {
+      background-color: $success-color;
+      pointer-events: none;
     }
   }
   

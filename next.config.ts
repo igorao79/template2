@@ -13,7 +13,31 @@ const nextConfig: NextConfig = {
   sassOptions: {
     includePaths: ['./src'],
     prependData: `@use "@/styles/variables" as *;`
-  }
+  },
+  async redirects() {
+    return [
+      {
+        source: '/rederict/animals',
+        destination: '/animals',
+        permanent: true,
+      },
+      {
+        source: '/rederict/tickets',
+        destination: '/tickets',
+        permanent: true,
+      },
+      {
+        source: '/rederict/events',
+        destination: '/events',
+        permanent: true,
+      },
+      {
+        source: '/rederict/location',
+        destination: '/location',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
