@@ -3,7 +3,6 @@
 .game {
   padding: 60px 0;
   background-color: #f7f8fd;
-  background-image: url('/images/paw-pattern.png');
   background-size: 200px;
   background-repeat: repeat;
   background-blend-mode: overlay;
@@ -245,43 +244,105 @@
 
 @media (max-width: 768px) {
   .game {
-    padding: 40px 0;
+    padding: 30px 0;
 
     &__title {
-      font-size: 2rem;
+      font-size: 1.8rem;
+      margin-top: 25px;
+    }
+
+    &__description {
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+    }
+    
+    &__start {
+      padding: 30px 0;
+    }
+    
+    &__start_button {
+      font-size: 1rem;
+      padding: 10px 25px;
     }
 
     &__grid {
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+    }
+
+    &__image_container {
+      height: 120px;
+    }
+
+    &__emoji {
+      font-size: 3.5rem;
+    }
+
+    &__name {
+      font-size: 1rem;
+    }
+    
+    &__content {
+      padding: 12px;
     }
 
     &__control {
       flex-direction: column;
-      gap: 15px;
-      padding: 15px;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      margin-bottom: 20px;
     }
-
-    &__score {
-      width: 100%;
-      justify-content: center;
-    }
-
+    
     &__replay {
       width: 100%;
       justify-content: center;
+      padding: 8px 15px;
     }
   }
 }
 
 @media (max-width: 480px) {
   .game {
+    padding: 20px 0;
+    
+    &__title {
+      font-size: 1.5rem;
+    }
+    
+    &__start {
+      padding: 20px 0;
+    }
+    
     &__grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
     }
 
     &__card {
-      max-width: 320px;
-      margin: 0 auto;
+      max-width: none;
+      margin: 0;
+    }
+    
+    &__image_container {
+      height: 100px;
+    }
+    
+    &__emoji {
+      font-size: 2rem;
+    }
+    
+    &__content {
+      padding: 8px;
+    }
+    
+    &__name {
+      font-size: 0.9rem;
+    }
+    
+    &__restart_button {
+      padding: 8px 15px;
+      font-size: 0.9rem;
     }
   }
 } 

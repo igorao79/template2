@@ -182,7 +182,7 @@ const LocationMap = () => {
               {transportOptions.map((option) => (
                 <motion.div 
                   key={option.id}
-                  className={styles.location__transport_card}
+                  className={`${styles.location__transport_card} ${option.id === 3 ? styles['location__transport_card--wide'] : ''}`}
                   variants={itemVariants}
                 >
                   <div className={styles.location__transport_icon}>

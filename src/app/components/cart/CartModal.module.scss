@@ -21,15 +21,15 @@
     border-radius: $border-radius-lg;
     box-shadow: $shadow-lg;
     z-index: 1001;
-    width: 90%;
-    max-width: 800px;
-    max-height: 90vh;
+    width: 95%;
+    max-width: 1200px;
+    max-height: 95vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
 
     @media (max-width: $breakpoint-md) {
-      width: 95%;
+      width: 98%;
     }
   }
 
@@ -37,7 +37,7 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    max-height: 90vh;
+    max-height: 95vh;
     width: 100%;
     background-color: $light-color;
     border-radius: $border-radius-lg;
@@ -124,10 +124,21 @@
 
   &__content {
     flex: 1;
-    overflow: auto;
+    overflow: hidden;
     position: relative;
     padding: $spacing-lg;
-    min-height: 300px;
+    min-height: 400px;
+    perspective: 1200px;
+    perspective-origin: center;
+    transform-style: preserve-3d;
+    
+    &_success {
+      overflow: visible;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
     
     > div {
       position: absolute;
@@ -135,6 +146,11 @@
       height: 100%;
       left: 0;
       top: 0;
+      overflow-y: auto;
+      padding-right: $spacing-sm;
+      -webkit-overflow-scrolling: touch;
+      will-change: transform, opacity;
+      backface-visibility: hidden;
     }
   }
 
@@ -147,7 +163,7 @@
     display: flex;
     flex-direction: column;
     gap: $spacing-md;
-    max-height: 60vh;
+    max-height: 65vh;
     overflow-y: auto;
   }
 
@@ -161,29 +177,62 @@
     border-radius: $border-radius-md;
     transition: $transition-base;
     border: 1px solid rgba($primary-color, 0.1);
+    position: relative;
 
     &:hover {
       background-color: rgba($light-bg-color, 0.8);
       box-shadow: $shadow-sm;
     }
+    
+    @media (max-width: $breakpoint-sm) {
+      grid-template-columns: auto 1fr auto;
+      grid-template-areas: 
+        "icon info info"
+        "icon counter total"
+        "icon . .";
+      gap: $spacing-sm;
+      padding: $spacing-sm;
+      padding-top: $spacing-lg;
+    }
   }
 
   &__product_icon {
     font-size: $font-size-2xl;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: $primary-color;
     color: $light-color;
     border-radius: $border-radius-sm;
+    
+    svg {
+      width: 30px;
+      height: 30px;
+    }
+    
+    @media (max-width: $breakpoint-sm) {
+      grid-area: icon;
+      width: 50px;
+      height: 50px;
+      font-size: $font-size-xl;
+      
+      svg {
+        width: 24px;
+        height: 24px;
+      }
+    }
   }
 
   &__product_info {
     display: flex;
     flex-direction: column;
     gap: $spacing-xs;
+    
+    @media (max-width: $breakpoint-sm) {
+      grid-area: info;
+    }
   }
 
   &__product_name {
@@ -203,10 +252,15 @@
     display: flex;
     align-items: center;
     gap: $spacing-sm;
-    background-color: rgba($primary-color, 0.05);
     padding: $spacing-sm;
     border-radius: $border-radius-md;
     height: 40px;
+    
+    @media (max-width: $breakpoint-sm) {
+      grid-area: counter;
+      height: auto;
+      padding: $spacing-xs;
+    }
   }
 
   &__counter_btn {
@@ -215,7 +269,7 @@
     color: $light-color;
     width: 30px;
     height: 30px;
-    border-radius: 50%;
+    border-radius: 10%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -229,8 +283,9 @@
     }
 
     svg {
-      width: 12px;
-      height: 12px;
+      width: 14px;
+      height: 14px;
+      display: block;
     }
   }
 
@@ -247,6 +302,12 @@
     min-width: 80px;
     text-align: right;
     font-size: $font-size-md;
+    
+    @media (max-width: $breakpoint-sm) {
+      grid-area: total;
+      min-width: auto;
+      font-size: $font-size-sm;
+    }
   }
 
   &__product_remove {
@@ -264,6 +325,14 @@
     &:hover {
       color: $danger-color;
       transform: scale(1.1);
+    }
+    
+    @media (max-width: $breakpoint-sm) {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      padding: $spacing-xs;
+      font-size: $font-size-sm;
     }
   }
 
@@ -305,8 +374,31 @@
     display: flex;
     flex-direction: column;
     gap: $spacing-lg;
-    max-height: 60vh;
+    max-height: 65vh;
     overflow-y: auto;
+    padding: $spacing-md;
+    position: relative;
+  }
+
+  &__form_container {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  &__swipe_hint {
+    margin-top: $spacing-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-color-secondary;
+    font-size: $font-size-sm;
+    gap: $spacing-xs;
+    opacity: 0.7;
+    padding: $spacing-sm;
+    border-radius: $border-radius-md;
+    background-color: rgba($light-bg-color, 0.5);
+    box-shadow: $shadow-sm;
   }
 
   &__form_group {
@@ -367,7 +459,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: $spacing-sm;
-    max-height: 200px;
+    max-height: 250px;
     overflow-y: auto;
     padding: $spacing-xs;
     background-color: $light-color;
@@ -398,6 +490,7 @@
 
       &:hover {
         background-color: color.adjust($primary-color, $lightness: -10%);
+        color: $light-color;
       }
     }
 
@@ -455,29 +548,31 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: $spacing-xl;
-    height: 100%;
+    padding: $spacing-md;
+    height: auto;
+    overflow: visible;
+    position: relative;
   }
 
   &__success_animation {
     width: 100%;
-    height: 300px;
-    margin-bottom: $spacing-lg;
-    max-width: 400px;
+    height: 180px;
+    margin-bottom: 7%;
+    max-width: 300px;
   }
 
   &__success_title {
-    font-size: $font-size-2xl;
+    font-size: $font-size-xl;
     color: $primary-color;
-    margin-bottom: $spacing-md;
+    margin-bottom: $spacing-sm;
     font-weight: 700;
   }
 
   &__success_message {
     font-size: $font-size-md;
     color: $text-color-secondary;
-    margin-bottom: $spacing-xl;
-    max-width: 600px;
+    margin-bottom: $spacing-lg;
+    max-width: 100%;
   }
 
   &__success_btn {

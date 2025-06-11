@@ -1,6 +1,6 @@
 'use client';
 
-import { useReducer, useEffect } from 'react';
+import { useReducer, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FaShoppingCart, 
@@ -16,7 +16,11 @@ import {
   FaTrash,
   FaCalendarAlt,
   FaEnvelope,
-  FaMoneyBillWave
+  FaMoneyBillWave,
+  FaUser,
+  FaChild,
+  FaUserTie,
+  FaTicketAlt
 } from 'react-icons/fa';
 import { useCart } from '@/app/context/CartContext';
 import styles from './CartModal.module.scss';
@@ -101,6 +105,7 @@ const CartModal = () => {
   } = useCart();
 
   const [formState, dispatch] = useReducer(formReducer, initialState);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
 
   // Инициализация формы из orderInfo
   useEffect(() => {
@@ -139,6 +144,15 @@ const CartModal = () => {
     }
     
     dispatch({ type: 'SET_DISABLED_DATES', payload: disabledDatesArray });
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -234,29 +248,107 @@ const CartModal = () => {
     }).format(price);
   };
 
-  // Анимация для переходов между шагами
+  // Form fields staggered animation
+  const formVariants = {
+    hidden: { 
+      opacity: 0 
+    },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  const formItemVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 20 
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 24
+      }
+    }
+  };
+
+  // Enhanced slide animation for steps with dramatic swipe effect
   const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? '100%' : '-100%',
-      opacity: 0,
-    }),
+    enter: (direction: number) => {
+      const isMobile = windowWidth <= 768;
+      return {
+        x: isMobile ? 0 : direction > 0 ? '100%' : '-100%',
+        opacity: 0.2,
+        scale: 0.95,
+        rotateY: isMobile ? 0 : direction > 0 ? '7deg' : '-7deg',
+        transition: { 
+          type: "tween", 
+          duration: 0.4,
+          ease: [0.16, 1, 0.3, 1]
+        }
+      }
+    },
     center: {
       x: 0,
       opacity: 1,
-      transition: { duration: 0.4, ease: "easeInOut" }
+      scale: 1,
+      rotateY: 0,
+      transition: { 
+        type: "tween", 
+        duration: 0.4,
+        ease: [0.16, 1, 0.3, 1]
+      }
     },
-    exit: (direction: number) => ({
-      x: direction < 0 ? '100%' : '-100%',
-      opacity: 0,
-      transition: { duration: 0.4, ease: "easeInOut" }
-    })
+    exit: (direction: number) => {
+      const isMobile = windowWidth <= 768;
+      return {
+        x: isMobile ? 0 : direction < 0 ? '100%' : '-100%',
+        opacity: 0.2,
+        scale: 0.95,
+        rotateY: isMobile ? 0 : direction < 0 ? '7deg' : '-7deg',
+        transition: { 
+          type: "tween", 
+          duration: 0.4,
+          ease: [0.16, 1, 0.3, 1]
+        }
+      }
+    }
   };
 
-  // Направление для анимации
+  // Определяет направление анимации перехода (слева направо или справа налево)
   const getDirection = () => {
-    if (checkoutStep === 1) return 1;
-    if (checkoutStep === 3) return -1;
-    return 0;
+    // Если нажали "Назад", то анимация слева направо (предыдущий шаг справа, текущий шаг слева)
+    if (checkoutStep < prevStepRef.current) {
+      return -1;
+    }
+    // Если нажали "Вперед", то анимация справа налево (предыдущий шаг слева, текущий шаг справа)
+    return 1;
+  };
+
+  // Отслеживаем изменение шага для определения направления анимации
+  const prevStepRef = useRef(checkoutStep);
+  useEffect(() => {
+    prevStepRef.current = checkoutStep;
+  }, [checkoutStep]);
+
+  // Function to render the appropriate icon based on iconType
+  const renderTicketIcon = (iconType: string) => {
+    switch (iconType) {
+      case 'user':
+        return <FaUser />;
+      case 'child':
+        return <FaChild />;
+      case 'userTie':
+        return <FaUserTie />;
+      default:
+        return <FaTicketAlt />;
+    }
   };
 
   // Отрисовка первого шага корзины (список товаров)
@@ -268,13 +360,14 @@ const CartModal = () => {
       exit="exit"
       variants={slideVariants}
       custom={getDirection()}
+      key="cart-step"
     >
       {cartItems && cartItems.length > 0 ? (
         <div className={styles.cart__items_list}>
           {cartItems.map((item) => (
             <div key={item.ticket.id} className={styles.cart__product_row}>
               <div className={styles.cart__product_icon}>
-                {item.ticket.icon}
+                {renderTicketIcon(item.ticket.iconType)}
               </div>
               <div className={styles.cart__product_info}>
                 <div className={styles.cart__product_name}>
@@ -290,7 +383,7 @@ const CartModal = () => {
                   onClick={() => updateQuantity(item.ticket.id, item.quantity - 1)}
                   aria-label="Уменьшить количество"
                 >
-                  <FaMinus />
+                  -
                 </button>
                 <div className={styles.cart__counter_value}>{item.quantity}</div>
                 <button 
@@ -298,7 +391,7 @@ const CartModal = () => {
                   onClick={() => updateQuantity(item.ticket.id, item.quantity + 1)}
                   aria-label="Увеличить количество"
                 >
-                  <FaPlus />
+                  +
                 </button>
               </div>
               <div className={styles.cart__product_total}>
@@ -338,96 +431,104 @@ const CartModal = () => {
       exit="exit"
       variants={slideVariants}
       custom={getDirection()}
+      key="checkout-step"
     >
-      <div className={styles.cart__form_group}>
-        <label htmlFor="email" className={styles.cart__form_label}>
-          <FaEnvelope className={styles.cart__form_icon} /> Email для получения билетов
-        </label>
-        <input
-          id="email"
-          type="email"
-          className={`${styles.cart__form_input} ${formState.emailError ? styles.cart__form_input_error : ''}`}
-          placeholder="example@example.com"
-          value={formState.email}
-          onChange={handleEmailChange}
-        />
-        {formState.emailError && <p className={styles.cart__error_message}>{formState.emailError}</p>}
-      </div>
+      <motion.div
+        className={styles.cart__form_container}
+        initial="hidden"
+        animate="visible"
+        variants={formVariants}
+      >
+        <motion.div className={styles.cart__form_group} variants={formItemVariants}>
+          <label htmlFor="email" className={styles.cart__form_label}>
+            <FaEnvelope className={styles.cart__form_icon} /> Email для получения билетов
+          </label>
+          <input
+            id="email"
+            type="email"
+            className={`${styles.cart__form_input} ${formState.emailError ? styles.cart__form_input_error : ''}`}
+            placeholder="example@example.com"
+            value={formState.email}
+            onChange={handleEmailChange}
+          />
+          {formState.emailError && <p className={styles.cart__error_message}>{formState.emailError}</p>}
+        </motion.div>
 
-      <div className={styles.cart__form_group}>
-        <label className={styles.cart__form_label}>
-          <FaCalendarAlt className={styles.cart__form_icon} /> Дата посещения (в течение двух недель)
-        </label>
-        <div className={styles.cart__date_picker}>
-          {getAvailableDates().map((date) => (
+        <motion.div className={styles.cart__form_group} variants={formItemVariants}>
+          <label className={styles.cart__form_label}>
+            <FaCalendarAlt className={styles.cart__form_icon} /> Дата посещения (в течение двух недель)
+          </label>
+          <div className={styles.cart__date_picker}>
+            {getAvailableDates().map((date) => (
+              <button
+                key={date.toISOString()}
+                type="button"
+                className={`${styles.cart__date_option} ${
+                  formState.selectedDate && date.toDateString() === formState.selectedDate.toDateString()
+                    ? styles.cart__date_option_selected
+                    : ''
+                }`}
+                onClick={() => handleDateSelect(date)}
+              >
+                {formatDate(date)}
+              </button>
+            ))}
+            
+            {formState.disabledDates.slice(0, 5).map((date) => (
+              <button
+                key={date.toISOString()}
+                type="button"
+                className={`${styles.cart__date_option} ${styles.cart__date_option_disabled}`}
+                disabled
+              >
+                {formatDate(date)}
+              </button>
+            ))}
+          </div>
+          {formState.dateError && <p className={styles.cart__error_message}>{formState.dateError}</p>}
+        </motion.div>
+
+        <motion.div className={styles.cart__form_group} variants={formItemVariants}>
+          <label className={styles.cart__form_label}>
+            <FaMoneyBillWave className={styles.cart__form_icon} /> Способ оплаты
+          </label>
+          <div className={styles.cart__payment_methods}>
             <button
-              key={date.toISOString()}
               type="button"
-              className={`${styles.cart__date_option} ${
-                formState.selectedDate && date.toDateString() === formState.selectedDate.toDateString()
-                  ? styles.cart__date_option_selected
-                  : ''
+              className={`${styles.cart__payment_option} ${
+                formState.paymentMethod === 'card' ? styles.cart__payment_option_selected : ''
               }`}
-              onClick={() => handleDateSelect(date)}
+              onClick={() => handlePaymentMethodSelect('card')}
             >
-              {formatDate(date)}
+              <FaCreditCard className={styles.cart__payment_icon} />
+              <span>Банковская карта</span>
             </button>
-          ))}
-          
-          {formState.disabledDates.slice(0, 5).map((date) => (
+            
             <button
-              key={date.toISOString()}
               type="button"
-              className={`${styles.cart__date_option} ${styles.cart__date_option_disabled}`}
-              disabled
+              className={`${styles.cart__payment_option} ${
+                formState.paymentMethod === 'paypal' ? styles.cart__payment_option_selected : ''
+              }`}
+              onClick={() => handlePaymentMethodSelect('paypal')}
             >
-              {formatDate(date)}
+              <FaPaypal className={styles.cart__payment_icon} />
+              <span>PayPal</span>
             </button>
-          ))}
-        </div>
-        {formState.dateError && <p className={styles.cart__error_message}>{formState.dateError}</p>}
-      </div>
-
-      <div className={styles.cart__form_group}>
-        <label className={styles.cart__form_label}>
-          <FaMoneyBillWave className={styles.cart__form_icon} /> Способ оплаты
-        </label>
-        <div className={styles.cart__payment_methods}>
-          <button
-            type="button"
-            className={`${styles.cart__payment_option} ${
-              formState.paymentMethod === 'card' ? styles.cart__payment_option_selected : ''
-            }`}
-            onClick={() => handlePaymentMethodSelect('card')}
-          >
-            <FaCreditCard className={styles.cart__payment_icon} />
-            <span>Банковская карта</span>
-          </button>
-          
-          <button
-            type="button"
-            className={`${styles.cart__payment_option} ${
-              formState.paymentMethod === 'paypal' ? styles.cart__payment_option_selected : ''
-            }`}
-            onClick={() => handlePaymentMethodSelect('paypal')}
-          >
-            <FaPaypal className={styles.cart__payment_icon} />
-            <span>PayPal</span>
-          </button>
-          
-          <button
-            type="button"
-            className={`${styles.cart__payment_option} ${
-              formState.paymentMethod === 'applepay' ? styles.cart__payment_option_selected : ''
-            }`}
-            onClick={() => handlePaymentMethodSelect('applepay')}
-          >
-            <FaApple className={styles.cart__payment_icon} />
-            <span>Apple Pay</span>
-          </button>
-        </div>
-        {formState.paymentError && <p className={styles.cart__error_message}>{formState.paymentError}</p>}
-      </div>
+            
+            <button
+              type="button"
+              className={`${styles.cart__payment_option} ${
+                formState.paymentMethod === 'applepay' ? styles.cart__payment_option_selected : ''
+              }`}
+              onClick={() => handlePaymentMethodSelect('applepay')}
+            >
+              <FaApple className={styles.cart__payment_icon} />
+              <span>Apple Pay</span>
+            </button>
+          </div>
+          {formState.paymentError && <p className={styles.cart__error_message}>{formState.paymentError}</p>}
+        </motion.div>
+      </motion.div>
     </motion.div>
   );
 
@@ -440,6 +541,7 @@ const CartModal = () => {
       exit="exit"
       variants={slideVariants}
       custom={getDirection()}
+      key="success-step"
     >
       <div className={styles.cart__success_animation}>
         <DotLottiePlayer
@@ -512,8 +614,12 @@ const CartModal = () => {
           </button>
         </div>
         
-        <div className={styles.cart__content}>
-          <AnimatePresence mode="wait" initial={false} custom={getDirection()}>
+        <div className={`${styles.cart__content} ${checkoutStep === 3 ? styles.cart__content_success : ''}`}>
+          <AnimatePresence
+            mode="wait"
+            initial={false}
+            custom={getDirection()}
+          >
             {checkoutStep === 1 && renderCartStep()}
             {checkoutStep === 2 && renderCheckoutStep()}
             {checkoutStep === 3 && renderSuccessStep()}

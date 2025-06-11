@@ -1,0 +1,63 @@
+@use '@/styles/variables' as *;
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: $spacing-xl;
+  text-align: center;
+  background-color: $light-bg-color;
+}
+
+.title {
+  font-size: 10rem;
+  font-weight: 800;
+  color: $primary-color;
+  margin: 0;
+  line-height: 1;
+  
+  @media (max-width: $breakpoint-sm) {
+    font-size: 6rem;
+  }
+}
+
+.subtitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: $text-color-primary;
+  margin: $spacing-md 0;
+  
+  @media (max-width: $breakpoint-sm) {
+    font-size: 1.8rem;
+  }
+}
+
+.description {
+  font-size: 1.2rem;
+  color: $text-color-secondary;
+  margin-bottom: $spacing-xl;
+  max-width: 600px;
+  
+  @media (max-width: $breakpoint-sm) {
+    font-size: 1rem;
+  }
+}
+
+.button {
+  display: inline-block;
+  background-color: $primary-color;
+  color: $light-color;
+  padding: $spacing-md $spacing-xl;
+  border-radius: $border-radius-lg;
+  font-weight: 600;
+  text-decoration: none;
+  transition: $transition-base;
+  
+  &:hover {
+    background-color: darken($primary-color, 10%);
+    transform: translateY(-3px);
+    box-shadow: $shadow-md;
+  }
+} 

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import MainLayout from './components/layout/MainLayout';
 import Hero from './components/sections/home/Hero';
 import AnimalGallery from './components/sections/animals/AnimalGallery';
 import AnimalSoundsGame from './components/sections/interactive/AnimalSoundsGame';
@@ -14,33 +13,35 @@ export default function Home() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Проверяем есть ли сохраненная секция в sessionStorage
-    const savedSection = typeof window !== 'undefined' 
-      ? sessionStorage.getItem('lastVisitedSection')
-      : null;
-    
-    // Прокручиваем к нужной секции при загрузке страницы
-    setTimeout(() => {
-      // Если есть сохраненная секция, используем ее
-      let section = '';
-      if (savedSection) {
-        section = savedSection;
-        sessionStorage.removeItem('lastVisitedSection'); // Удаляем после использования
-      } else {
-        section = pathname.replace('/', '');
+    // Скроллим к нужному разделу при загрузке страницы без анимации
+    if (pathname !== '/') {
+      const sectionId = pathname.replace('/', '');
+      const element = document.getElementById(sectionId);
+      if (element) {
+        // Используем scrollIntoView с поведением 'instant' для мгновенного скролла
+        // без видимой анимации
+        window.scrollTo({
+          top: element.offsetTop,
+          behavior: 'instant' as ScrollBehavior
+        });
       }
-      
-      if (section && section !== '') {
-        const element = document.getElementById(section);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
+    }
+
+    // Если есть хэш в URL, также прокручиваем без анимации
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const id = window.location.hash.substring(1);
+      const element = document.getElementById(id);
+      if (element) {
+        window.scrollTo({
+          top: element.offsetTop,
+          behavior: 'instant' as ScrollBehavior
+        });
       }
-    }, 100); // Небольшая задержка для уверенности, что DOM загружен
+    }
   }, [pathname]);
 
   return (
-    <MainLayout>
+    <>
       <Hero />
       <div id="animals">
         <AnimalGallery />
@@ -55,6 +56,6 @@ export default function Home() {
       <div id="location">
         <LocationMap />
       </div>
-    </MainLayout>
+    </>
   );
 }

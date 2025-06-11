@@ -196,10 +196,11 @@
     top: 100%;
     left: 0;
     width: 100%;
-    background-color: $primary-color;
+    background-color: #008060f2;
     box-shadow: $shadow-md;
     padding: $spacing-md 0;
     z-index: $z-index-dropdown;
+    backdrop-filter: blur(8px);
   }
 
   &__mobile-list {

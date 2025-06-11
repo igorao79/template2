@@ -20,18 +20,14 @@ const Hero = () => {
 
   const scrollToAnimals = (e: React.MouseEvent) => {
     e.preventDefault();
-    const animalsSection = document.getElementById('animals');
-    if (animalsSection) {
-      animalsSection.scrollIntoView({ behavior: 'smooth' });
-    }
+    // Only update URL, no scrolling
+    window.history.replaceState({}, '', '/animals');
   };
   
   const scrollToTickets = (e: React.MouseEvent) => {
     e.preventDefault();
-    const ticketsSection = document.getElementById('tickets');
-    if (ticketsSection) {
-      ticketsSection.scrollIntoView({ behavior: 'smooth' });
-    }
+    // Only update URL, no scrolling
+    window.history.replaceState({}, '', '/tickets');
   };
 
   return (
@@ -45,7 +41,7 @@ const Hero = () => {
           muted
           loop
           playsInline
-          poster="/images/hero-bg.jpg"
+          poster="./images/hero-bg.webp"
         >
           <source src="./video.mp4" type="video/mp4" />
         </video>

@@ -15,7 +15,7 @@ const events = [
     date: '2023-06-15',
     time: '12:00',
     location: 'Павильон хищников',
-    image: '/images/feeding-lions.webp',
+    image: '/images/events/feed_lions.webp',
     category: 'feeding',
     price: 300,
     ticketType: 'event'
@@ -27,7 +27,7 @@ const events = [
     date: '2023-06-16',
     time: '14:00',
     location: 'Дельфинарий',
-    image: '/images/dolphin-show.webp',
+    image: '/images/events/dolphin_show.webp',
     category: 'show',
     price: 500,
     ticketType: 'event'
@@ -39,7 +39,7 @@ const events = [
     date: '2023-06-17',
     time: '15:30',
     location: 'Образовательный центр',
-    image: '/images/reptile-lecture.webp',
+    image: '/images/events/reptiles_zoo.webp',
     category: 'lecture',
     price: 200,
     ticketType: 'event'
@@ -51,7 +51,7 @@ const events = [
     date: '2023-06-18',
     time: '10:00 - 18:00',
     location: 'Детская зона',
-    image: '/images/petting-zoo.webp',
+    image: '/images/events/contact_zoo.webp',
     category: 'activity',
     price: 400,
     ticketType: 'event'
@@ -63,7 +63,7 @@ const events = [
     date: '2023-06-20',
     time: '21:00',
     location: 'Главный вход',
-    image: '/images/night-zoo.webp',
+    image: '/images/events/night_at_zoo.webp',
     category: 'special',
     price: 800,
     ticketType: 'event'
@@ -104,10 +104,8 @@ const EventsCalendar = () => {
   };
   
   const handleScrollToTickets = () => {
-    const ticketsSection = document.getElementById('tickets');
-    if (ticketsSection) {
-      ticketsSection.scrollIntoView({ behavior: 'smooth' });
-    }
+    // Only update URL, no scrolling
+    window.history.replaceState({}, '', '/tickets');
   };
 
   const handleAddToCart = (event: typeof events[0]) => {
@@ -117,7 +115,7 @@ const EventsCalendar = () => {
       price: event.price,
       description: `${new Date(event.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}, ${event.time}`,
       type: 'event' as 'adult' | 'child' | 'family' | 'senior', // Тип для билетов на события
-      icon: '🎫'
+      iconType: 'ticket'
     }, 1);
 
     setAddedToCart(prev => ({ ...prev, [event.id]: true }));
@@ -177,7 +175,10 @@ const EventsCalendar = () => {
                   className={styles.events__image}
                   width={500}
                   height={300}
-                  quality={80}
+                  quality={85}
+                  sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, 33vw"
+                  priority={event.id === 1}
+                  loading={event.id === 1 ? "eager" : "lazy"}
                 />
                 <div className={styles.events__overlay}></div>
                 <div className={styles.events__badge}>

@@ -26,6 +26,11 @@
     @media (min-width: $breakpoint-lg) {
       grid-template-columns: repeat(4, 1fr);
     }
+    
+    @media (max-width: $breakpoint-sm) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: $spacing-md;
+    }
   }
 
   &__column {
@@ -33,21 +38,39 @@
       font-size: $font-size-xl;
       font-weight: 700;
       margin-bottom: $spacing-md;
+      
+      @media (max-width: $breakpoint-sm) {
+        font-size: $font-size-lg;
+        margin-bottom: $spacing-sm;
+      }
     }
 
     &-text {
       margin-bottom: $spacing-md;
       line-height: 1.6;
+      
+      @media (max-width: $breakpoint-sm) {
+        font-size: $font-size-sm;
+        margin-bottom: $spacing-sm;
+      }
     }
   }
 
   &__social {
     display: flex;
     gap: $spacing-md;
+    
+    @media (max-width: $breakpoint-sm) {
+      gap: $spacing-sm;
+    }
 
     &-link {
       font-size: $font-size-xl;
       transition: $transition-base;
+      
+      @media (max-width: $breakpoint-sm) {
+        font-size: $font-size-lg;
+      }
 
       &:hover {
         color: $primary-color;
@@ -60,10 +83,18 @@
       display: flex;
       flex-direction: column;
       gap: $spacing-sm;
+      
+      @media (max-width: $breakpoint-sm) {
+        gap: $spacing-xs;
+      }
     }
 
     &-item {
       transition: $transition-base;
+      
+      @media (max-width: $breakpoint-sm) {
+        font-size: $font-size-sm;
+      }
 
       &:hover {
         color: $primary-color;
@@ -76,11 +107,21 @@
       display: flex;
       justify-content: space-between;
       margin-bottom: $spacing-sm;
+      
+      @media (max-width: $breakpoint-sm) {
+        font-size: $font-size-sm;
+        margin-bottom: $spacing-xs;
+      }
     }
 
     &-note {
       margin-top: $spacing-md;
       color: $secondary-color;
+      
+      @media (max-width: $breakpoint-sm) {
+        font-size: $font-size-sm;
+        margin-top: $spacing-sm;
+      }
     }
   }
 
@@ -89,6 +130,11 @@
       display: flex;
       align-items: flex-start;
       margin-bottom: $spacing-sm;
+      
+      @media (max-width: $breakpoint-sm) {
+        font-size: $font-size-sm;
+        margin-bottom: $spacing-xs;
+      }
 
       &-icon {
         margin-right: $spacing-sm;
@@ -103,5 +149,16 @@
     padding-top: $spacing-md;
     border-top: 1px solid rgba($light-color, 0.2);
     text-align: center;
+    
+    @media (max-width: $breakpoint-sm) {
+      margin-top: $spacing-md;
+      padding-top: $spacing-sm;
+      font-size: $font-size-xs;
+    }
+  }
+  
+  @media (max-width: $breakpoint-sm) {
+    padding-top: $spacing-xl;
+    padding-bottom: $spacing-md;
   }
 } 

@@ -204,7 +204,26 @@
     }
     
     &__transport_grid {
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 15px;
+    }
+    
+    &__transport_card {
+      padding: 20px 15px;
+    }
+    
+    &__transport_icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    
+    &__transport_name {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+    
+    &__map {
+      height: 350px;
     }
   }
 }
@@ -214,7 +233,83 @@
     padding: 40px 0;
     
     &__transport_grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    
+    &__transport_card {
+      padding: 15px 10px;
+      
+      &:hover {
+        transform: none;
+      }
+      
+      &--wide {
+        grid-column: span 2;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+        
+        .location__transport_icon {
+          margin-bottom: 0;
+          margin-right: 10px;
+          font-size: 1.3rem;
+        }
+        
+        .location__transport_name {
+          margin-bottom: 0;
+          margin-right: 15px;
+        }
+        
+        .location__transport_list {
+          text-align: left;
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+        }
+      }
+    }
+    
+    &__transport_icon {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+    
+    &__transport_name {
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+    
+    &__transport_item {
+      font-size: 0.8rem;
+      margin-bottom: 5px;
+    }
+    
+    &__map {
+      height: 250px;
+    }
+    
+    &__address {
+      padding: 15px;
+      
+      h3 {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+      }
+      
+      p {
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+      }
+    }
+    
+    &__contact_item {
+      font-size: 0.9rem;
+      
+      svg {
+        font-size: 1rem;
+      }
     }
   }
 } 

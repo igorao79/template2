@@ -9,35 +9,26 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    unoptimized: true,
   },
   sassOptions: {
     includePaths: ['./src'],
     prependData: `@use "@/styles/variables" as *;`
   },
-  async redirects() {
-    return [
-      {
-        source: '/rederict/animals',
-        destination: '/animals',
-        permanent: true,
-      },
-      {
-        source: '/rederict/tickets',
-        destination: '/tickets',
-        permanent: true,
-      },
-      {
-        source: '/rederict/events',
-        destination: '/events',
-        permanent: true,
-      },
-      {
-        source: '/rederict/location',
-        destination: '/location',
-        permanent: true,
-      },
-    ];
-  },
+  output: 'export',
+  distDir: 'out',
+  basePath: process.env.NODE_ENV === 'production' ? '/template2' : '',
+  trailingSlash: false,
+  compress: true,
+  // Enable React strict mode for improved development experience
+  reactStrictMode: true,
+  // Enable optimizations in production builds
+  productionBrowserSourceMaps: false,
+  // Configure page data collection for better insights
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ['react-icons'],
+  }
 };
 
 export default nextConfig;

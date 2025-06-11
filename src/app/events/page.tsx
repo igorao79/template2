@@ -1,21 +1,40 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import AnimalGallery from '../components/sections/animals/AnimalGallery';
+import AnimalSoundsGame from '../components/sections/interactive/AnimalSoundsGame';
+import Hero from '../components/sections/home/Hero';
+import TicketCards from '../components/sections/tickets/TicketCards';
+import EventsCalendar from '../components/sections/events/EventsCalendar';
+import LocationMap from '../components/sections/location/LocationMap';
 
 export default function EventsPage() {
-  const router = useRouter();
-
   useEffect(() => {
-    // Сохраняем текущий раздел перед перенаправлением
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('lastVisitedSection', 'events');
-      router.push('/#events');
+    const element = document.getElementById('events');
+    if (element) {
+      // Scrolling with a small delay to ensure the page has rendered
+      setTimeout(() => {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
     }
-  }, [router]);
+  }, []);
 
   return (
-    // Пустой возврат, так как мы сразу перенаправляем
-    <></>
+    <>
+      <Hero />
+      <div id="animals">
+        <AnimalGallery />
+        <AnimalSoundsGame />
+      </div>
+      <div id="tickets">
+        <TicketCards />
+      </div>
+      <div id="events">
+        <EventsCalendar />
+      </div>
+      <div id="location">
+        <LocationMap />
+      </div>
+    </>
   );
 } 

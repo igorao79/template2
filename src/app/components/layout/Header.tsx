@@ -24,12 +24,6 @@ const Header = () => {
     const initialScroll = window.scrollY > 50;
     setIsScrolled(initialScroll);
 
-    // Функция для обновления URL без перезагрузки страницы
-    const updateUrl = (section: string) => {
-      const newPath = section === 'home' || section === '' ? '/' : `/${section}`;
-      window.history.replaceState({}, '', newPath);
-    };
-
     const handleScroll = () => {
       // Обновляем состояние скролла для изменения фона хедера
       setIsScrolled(window.scrollY > 50);
@@ -39,7 +33,10 @@ const Header = () => {
       
       if (window.scrollY < 100) {
         setActiveSection('home');
-        updateUrl('');
+        // Обновляем URL без перезагрузки
+        if (pathname !== '/') {
+          window.history.replaceState({}, '', '/');
+        }
         return;
       }
       
@@ -50,7 +47,10 @@ const Header = () => {
           const rect = el.getBoundingClientRect();
           if (rect.top <= 100) {
             setActiveSection(section);
-            updateUrl(section);
+            // Обновляем URL без перезагрузки
+            if (pathname !== `/${section}`) {
+              window.history.replaceState({}, '', `/${section}`);
+            }
             break;
           }
         }
@@ -65,15 +65,19 @@ const Header = () => {
     e.preventDefault();
     
     if (sectionId === 'home') {
+      // Плавно скроллим наверх
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      setActiveSection('home');
+      // Обновляем URL без перезагрузки
       window.history.replaceState({}, '', '/');
+      setActiveSection('home');
     } else {
       const section = document.getElementById(sectionId);
       if (section) {
+        // Плавно скроллим к секции
         section.scrollIntoView({ behavior: 'smooth' });
-        setActiveSection(sectionId);
+        // Обновляем URL без перезагрузки
         window.history.replaceState({}, '', `/${sectionId}`);
+        setActiveSection(sectionId);
       }
     }
     

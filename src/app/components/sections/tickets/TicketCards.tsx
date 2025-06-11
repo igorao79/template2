@@ -36,11 +36,24 @@ const getTicketTypeForCart = (type: string): 'adult' | 'child' | 'family' | 'sen
   return 'adult';
 };
 
-const getTicketIcon = (type: string) => {
-  if (type.includes('Взрослый')) return <FaUser />;
-  if (type.includes('Детский')) return <FaChild />;
-  if (type.includes('Льготный')) return <FaUserTie />;
-  return <FaTicketAlt />;
+const getTicketIcon = (type: string): string => {
+  if (type.includes('Взрослый')) return 'user';
+  if (type.includes('Детский')) return 'child';
+  if (type.includes('Льготный')) return 'userTie';
+  return 'ticket';
+};
+
+const renderTicketIcon = (iconType: string) => {
+  switch (iconType) {
+    case 'user':
+      return <FaUser />;
+    case 'child':
+      return <FaChild />;
+    case 'userTie':
+      return <FaUserTie />;
+    default:
+      return <FaTicketAlt />;
+  }
 };
 
 const TicketCards = () => {
@@ -69,7 +82,7 @@ const TicketCards = () => {
       price: ticket.price,
       description: ticket.description,
       type: getTicketTypeForCart(ticket.type),
-      icon: getTicketIcon(ticket.type)
+      iconType: getTicketIcon(ticket.type)
     };
     
     console.log('TicketCards: Данные билета для корзины:', cartTicket);
@@ -102,12 +115,12 @@ const TicketCards = () => {
           {tickets.map((ticket) => (
             <motion.div 
               key={ticket.id}
-              className={styles.tickets__card}
+              className={`${styles.tickets__card} ${ticket.id === 3 ? styles['tickets__card--wide'] : ''}`}
               variants={cardVariants}
               whileHover={{ y: -10, transition: { duration: 0.2 } }}
             >
               <div className={styles.tickets__card_header}>
-                {getTicketIcon(ticket.type)}
+                {renderTicketIcon(getTicketIcon(ticket.type))}
                 <h3 className={styles.tickets__type}>{ticket.type}</h3>
                 <p className={styles.tickets__price}>{ticket.price} ₽</p>
                 <p className={styles.tickets__description}>{ticket.description}</p>

@@ -8,7 +8,7 @@ export type Ticket = {
   price: number;
   description: string;
   type: 'adult' | 'child' | 'family' | 'senior';
-  icon: React.ReactNode;
+  iconType: string;
 };
 
 export type CartItem = {

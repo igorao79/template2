@@ -228,7 +228,21 @@
     }
     
     &__grid {
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: $spacing-md;
+    }
+    
+    &__event_title {
+      font-size: $font-size-md;
+    }
+    
+    &__event_description {
+      font-size: $font-size-xs;
+      margin-bottom: $spacing-sm;
+    }
+    
+    &__image_container {
+      height: 180px;
     }
   }
 }
@@ -238,16 +252,68 @@
     padding: $spacing-xl 0;
     
     &__grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: $spacing-sm;
+    }
+    
+    &__card {
+      box-shadow: $shadow-sm;
+    }
+    
+    &__image_container {
+      height: 120px;
+    }
+    
+    &__event_title {
+      font-size: $font-size-sm;
+      margin-bottom: $spacing-xs;
+    }
+    
+    &__event_description {
+      display: none; // Hide description on very small screens
+    }
+    
+    &__content {
+      padding: $spacing-sm;
+    }
+    
+    &__details {
+      margin-bottom: $spacing-sm;
+      gap: $spacing-xs;
+    }
+    
+    &__detail {
+      font-size: $font-size-xs;
+      
+      svg {
+        font-size: $font-size-sm;
+      }
+    }
+    
+    &__actions {
+      flex-direction: column;
+      gap: $spacing-xs;
+    }
+    
+    &__ticket_button, &__more_button {
+      width: 100%;
+      font-size: $font-size-xs;
+      padding: $spacing-xs;
     }
     
     &__filter {
       flex-direction: column;
-      align-items: stretch;
+      gap: $spacing-xs;
+      margin-bottom: $spacing-md;
+      overflow-x: visible;
+      flex-wrap: wrap;
     }
     
     &__filter_button {
       width: 100%;
+      text-align: center;
+      padding: $spacing-xs;
+      border-radius: $border-radius-md;
     }
   }
 } 
