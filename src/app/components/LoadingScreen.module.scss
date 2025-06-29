@@ -1,0 +1,106 @@
+@use '@/styles/variables' as *;
+
+.loadingScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: $dark-color;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  opacity: 1;
+  visibility: visible;
+  transition: all 0.8s ease-in-out;
+  will-change: opacity, visibility;
+
+  &.fadeOut {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: slideIn 0.5s ease-in-out forwards;
+  will-change: transform, opacity;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 3.5rem;
+  font-weight: 700;
+  user-select: none;
+}
+
+.text {
+  color: $light-color;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.dot {
+  color: $primary-color;
+  margin-left: 2px;
+  animation: pulse 2s infinite;
+  will-change: transform, opacity;
+}
+
+.dots {
+  display: flex;
+  gap: 0.5rem;
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    background-color: $primary-color;
+    border-radius: 50%;
+    animation: bounce 0.8s infinite;
+
+    &:nth-child(2) {
+      animation-delay: 0.2s;
+      opacity: 0.8;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 0.4s;
+      opacity: 0.6;
+    }
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+} 

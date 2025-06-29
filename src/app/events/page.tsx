@@ -12,9 +12,19 @@ export default function EventsPage() {
   useEffect(() => {
     const element = document.getElementById('events');
     if (element) {
+      // Get the header height to offset the scroll position
+      const header = document.querySelector('header');
+      const headerHeight = header ? header.offsetHeight : 0;
+      
+      // Calculate the position to scroll to
+      const position = element.offsetTop - headerHeight;
+      
       // Scrolling with a small delay to ensure the page has rendered
       setTimeout(() => {
-        element.scrollIntoView({ behavior: 'smooth' });
+        window.scrollTo({
+          top: position,
+          behavior: 'smooth'
+        });
       }, 100);
     }
   }, []);

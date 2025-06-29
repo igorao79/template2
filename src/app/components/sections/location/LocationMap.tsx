@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import { FaMapMarkerAlt, FaBus, FaSubway, FaCar, FaPhone, FaClock, FaEnvelope } from 'react-icons/fa';
 import styles from './LocationMap.module.scss';
+import { useAnimation } from '../../../context/AnimationContext';
 
 // Определяем тип для Leaflet, который будет доступен глобально
 declare global {
@@ -41,6 +42,15 @@ const transportOptions = [
 const LocationMap = () => {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInitialized = useRef<boolean>(false);
+  const { canAnimate } = useAnimation();
+  
+  // Refs для отслеживания видимости элементов
+  const headerRef = useRef(null);
+  const transportRef = useRef(null);
+  
+  // Определяем, видны ли элементы
+  const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
+  const transportInView = useInView(transportRef, { once: true, amount: 0.1 });
 
   useEffect(() => {
     // Проверяем, что карта еще не инициализирована
@@ -132,9 +142,10 @@ const LocationMap = () => {
     <section className={styles.location} id="location">
       <div className={styles.location__container}>
         <motion.div 
+          ref={headerRef}
           className={styles.location__header}
           initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          animate={(canAnimate && headerInView) ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
@@ -170,10 +181,11 @@ const LocationMap = () => {
           </div>
           
           <motion.div 
+            ref={transportRef}
             className={styles.location__transport}
             variants={containerVariants}
             initial="hidden"
-            whileInView="visible"
+            animate={(canAnimate && transportInView) ? "visible" : "hidden"}
             viewport={{ once: true }}
           >
             <h3 className={styles.location__transport_title}>Транспорт</h3>

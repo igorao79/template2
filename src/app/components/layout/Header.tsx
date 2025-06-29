@@ -64,21 +64,24 @@ const Header = () => {
   const scrollToSection = (e: React.MouseEvent, sectionId: string) => {
     e.preventDefault();
     
-    if (sectionId === 'home') {
-      // Плавно скроллим наверх
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      // Обновляем URL без перезагрузки
-      window.history.replaceState({}, '', '/');
-      setActiveSection('home');
-    } else {
-      const section = document.getElementById(sectionId);
-      if (section) {
-        // Плавно скроллим к секции
-        section.scrollIntoView({ behavior: 'smooth' });
-        // Обновляем URL без перезагрузки
-        window.history.replaceState({}, '', `/${sectionId}`);
-        setActiveSection(sectionId);
-      }
+    // Включаем плавный скролл
+    document.documentElement.classList.add('smooth-scroll');
+    
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const header = document.querySelector('header');
+      const headerHeight = header ? header.offsetHeight : 0;
+      const elementTop = element.offsetTop - headerHeight;
+      
+      window.scrollTo({
+        top: elementTop,
+        behavior: 'smooth'
+      });
+      
+      // Отключаем плавный скролл после завершения анимации
+      setTimeout(() => {
+        document.documentElement.classList.remove('smooth-scroll');
+      }, 1000); // Примерное время анимации скролла
     }
     
     if (mobileMenuOpen) {

@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "../styles/globals.scss";
-import Header from './components/layout/Header';
-import Footer from './components/layout/Footer';
-import { CartProvider } from './context/CartContext';
-import MainLayout from './components/layout/MainLayout';
+import Providers from '@/app/providers';
 
 export const metadata: Metadata = {
   title: "Зоопарк - Удивительный мир животных",
@@ -46,15 +43,12 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" />
       </head>
       <body>
-        <CartProvider>
-          <Header />
-          <MainLayout>
-            {children}
-          </MainLayout>
-          <Footer />
-        </CartProvider>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

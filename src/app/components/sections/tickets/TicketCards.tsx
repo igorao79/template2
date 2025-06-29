@@ -1,9 +1,11 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { FaTicketAlt, FaCheck, FaUser, FaChild, FaUsers, FaUserTie } from 'react-icons/fa';
 import styles from './TicketCards.module.scss';
 import { useCart } from '@/app/context/CartContext';
+import { useAnimation } from '../../../context/AnimationContext';
 
 const tickets = [
   {
@@ -58,6 +60,15 @@ const renderTicketIcon = (iconType: string) => {
 
 const TicketCards = () => {
   const { addToCart } = useCart();
+  const { canAnimate } = useAnimation();
+  
+  // Refs для отслеживания видимости элементов
+  const headerRef = useRef(null);
+  const gridRef = useRef(null);
+  
+  // Определяем, видны ли элементы
+  const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
+  const gridInView = useInView(gridRef, { once: true, amount: 0.1 });
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -93,10 +104,10 @@ const TicketCards = () => {
     <section className={styles.tickets} id="tickets">
       <div className={styles.tickets__container}>
         <motion.div 
+          ref={headerRef}
           className={styles.tickets__header}
           initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          animate={(canAnimate && headerInView) ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
           transition={{ duration: 0.5 }}
         >
           <h2 className={styles.tickets__title}>Билеты в зоопарк</h2>
@@ -106,18 +117,18 @@ const TicketCards = () => {
         </motion.div>
 
         <motion.div 
+          ref={gridRef}
           className={styles.tickets__grid}
           variants={containerVariants}
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
+          animate={(canAnimate && gridInView) ? "visible" : "hidden"}
         >
           {tickets.map((ticket) => (
             <motion.div 
               key={ticket.id}
               className={`${styles.tickets__card} ${ticket.id === 3 ? styles['tickets__card--wide'] : ''}`}
               variants={cardVariants}
-              whileHover={{ y: -10, transition: { duration: 0.2 } }}
+              whileHover={(canAnimate && gridInView) ? { y: -10, transition: { duration: 0.2 } } : {}}
             >
               <div className={styles.tickets__card_header}>
                 {renderTicketIcon(getTicketIcon(ticket.type))}

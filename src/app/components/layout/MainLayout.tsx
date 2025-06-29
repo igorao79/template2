@@ -1,19 +1,20 @@
 'use client';
 
 import { ReactNode } from 'react';
-import Header from './Header';
-import Footer from './Footer';
 import styles from './MainLayout.module.scss';
 import CartModal from '../cart/CartModal';
+import { useAnimation } from '@/app/context/AnimationContext';
 
 interface MainLayoutProps {
   children: ReactNode;
 }
 
 const MainLayout = ({ children }: MainLayoutProps) => {
+  const { isLoading } = useAnimation();
+
   return (
     <>
-      <main className={styles.main}>
+      <main className={`${styles.main} ${isLoading ? styles.hidden : ''}`}>
         {children}
       </main>
       <CartModal />

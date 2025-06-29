@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaTicketAlt, FaChevronRight, FaShoppingCart } from 'react-icons/fa';
 import Image from 'next/image';
 import styles from './EventsCalendar.module.scss';
 import { useCart } from '@/app/context/CartContext';
+import { useAnimation } from '../../../context/AnimationContext';
 
 const events = [
   {
@@ -81,31 +82,39 @@ const categories = [
 
 const EventsCalendar = () => {
   const { addToCart } = useCart();
+  const { canAnimate } = useAnimation();
   const [activeCategory, setActiveCategory] = useState('all');
   const [addedToCart, setAddedToCart] = useState<Record<number, boolean>>({});
+  
+  // Refs для отслеживания видимости элементов
+  const headerRef = useRef(null);
+  const filterRef = useRef(null);
+  const gridRef = useRef(null);
+  
+  // Определяем, видны ли элементы
+  const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
+  const filterInView = useInView(filterRef, { once: true, amount: 0.3 });
+  const gridInView = useInView(gridRef, { once: true, amount: 0.1 });
 
   const filteredEvents = activeCategory === 'all' 
     ? events 
     : events.filter(event => event.category === activeCategory);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
-  
   const handleScrollToTickets = () => {
-    // Only update URL, no scrolling
-    window.history.replaceState({}, '', '/tickets');
+    const ticketsSection = document.getElementById('tickets');
+    if (ticketsSection) {
+      // Get the header height to offset the scroll position
+      const header = document.querySelector('header');
+      const headerHeight = header ? header.offsetHeight : 0;
+      
+      // Calculate the position to scroll to
+      const position = ticketsSection.offsetTop - headerHeight;
+      
+      window.scrollTo({
+        top: position,
+        behavior: 'smooth'
+      });
+    }
   };
 
   const handleAddToCart = (event: typeof events[0]) => {
@@ -130,10 +139,10 @@ const EventsCalendar = () => {
     <section className={styles.events} id="events">
       <div className={styles.events__container}>
         <motion.div 
+          ref={headerRef}
           className={styles.events__header}
           initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          animate={(canAnimate && headerInView) ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
           transition={{ duration: 0.5 }}
         >
           <h2 className={styles.events__title}>События и мероприятия</h2>
@@ -143,7 +152,13 @@ const EventsCalendar = () => {
           </p>
         </motion.div>
 
-        <div className={styles.events__filter}>
+        <motion.div
+          ref={filterRef}
+          className={styles.events__filter}
+          initial={{ opacity: 0, y: 20 }}
+          animate={(canAnimate && filterInView) ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
           {categories.map(category => (
             <button 
               key={category.id}
@@ -153,20 +168,31 @@ const EventsCalendar = () => {
               {category.name}
             </button>
           ))}
-        </div>
+        </motion.div>
 
         <motion.div 
+          ref={gridRef}
           className={styles.events__grid}
-          variants={containerVariants}
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.1,
+              },
+            },
+          }}
           initial="hidden"
-          animate="visible"
+          animate={(canAnimate && gridInView) ? "visible" : "hidden"}
         >
           {filteredEvents.map(event => (
             <motion.div 
               key={event.id}
               className={styles.events__card}
-              variants={itemVariants}
-              whileHover={{ y: -10, transition: { duration: 0.2 } }}
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+              }}
             >
               <div className={styles.events__image_container}>
                 <Image 
@@ -208,11 +234,9 @@ const EventsCalendar = () => {
                 </div>
                 
                 <div className={styles.events__actions}>
-                  <motion.button 
+                  <button 
                     className={`${styles.events__ticket_button} ${addedToCart[event.id] ? styles.events__ticket_button_added : ''}`}
                     onClick={() => handleAddToCart(event)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
                     disabled={addedToCart[event.id]}
                   >
                     {addedToCart[event.id] ? (
@@ -226,17 +250,15 @@ const EventsCalendar = () => {
                         <span>Купить билет</span>
                       </>
                     )}
-                  </motion.button>
+                  </button>
                   
-                  <motion.button 
+                  <button 
                     className={styles.events__more_button}
                     onClick={handleScrollToTickets}
-                    whileHover={{ x: 5 }}
-                    transition={{ duration: 0.2 }}
                   >
                     <span>Перейти к билетам</span>
                     <FaChevronRight />
-                  </motion.button>
+                  </button>
                 </div>
               </div>
             </motion.div>

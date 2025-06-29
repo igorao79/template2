@@ -13,29 +13,34 @@ export default function Home() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Скроллим к нужному разделу при загрузке страницы без анимации
+    // Функция для мгновенного скролла к элементу
+    const instantScrollToElement = (element: HTMLElement) => {
+      const header = document.querySelector('header');
+      const headerHeight = header ? header.offsetHeight : 0;
+      const elementTop = element.offsetTop - headerHeight;
+
+      // Используем instant для мгновенного скролла без анимации
+      window.scrollTo({
+        top: elementTop,
+        behavior: 'instant'
+      });
+    };
+
+    // Обработка скролла при загрузке страницы
     if (pathname !== '/') {
       const sectionId = pathname.replace('/', '');
       const element = document.getElementById(sectionId);
       if (element) {
-        // Используем scrollIntoView с поведением 'instant' для мгновенного скролла
-        // без видимой анимации
-        window.scrollTo({
-          top: element.offsetTop,
-          behavior: 'instant' as ScrollBehavior
-        });
+        instantScrollToElement(element);
       }
     }
 
-    // Если есть хэш в URL, также прокручиваем без анимации
+    // Обработка хэша в URL
     if (typeof window !== 'undefined' && window.location.hash) {
       const id = window.location.hash.substring(1);
       const element = document.getElementById(id);
       if (element) {
-        window.scrollTo({
-          top: element.offsetTop,
-          behavior: 'instant' as ScrollBehavior
-        });
+        instantScrollToElement(element);
       }
     }
   }, [pathname]);

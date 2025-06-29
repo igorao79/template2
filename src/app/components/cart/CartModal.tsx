@@ -283,18 +283,15 @@ const CartModal = () => {
     enter: (direction: number) => {
       const isMobile = windowWidth <= 768;
       return {
+        position: 'absolute',
         x: isMobile ? 0 : direction > 0 ? '100%' : '-100%',
         opacity: 0.2,
         scale: 0.95,
         rotateY: isMobile ? 0 : direction > 0 ? '7deg' : '-7deg',
-        transition: { 
-          type: "tween", 
-          duration: 0.4,
-          ease: [0.16, 1, 0.3, 1]
-        }
       }
     },
     center: {
+      position: 'relative',
       x: 0,
       opacity: 1,
       scale: 1,
@@ -308,6 +305,7 @@ const CartModal = () => {
     exit: (direction: number) => {
       const isMobile = windowWidth <= 768;
       return {
+        position: 'absolute',
         x: isMobile ? 0 : direction < 0 ? '100%' : '-100%',
         opacity: 0.2,
         scale: 0.95,
@@ -567,87 +565,86 @@ const CartModal = () => {
   // Основной рендер модального окна
   return (
     <ModalPortal isOpen={isCartOpen} onClose={closeCart}>
-      <div className={styles.cart__modal_content}>
-        <div className={styles.cart__header}>
-          {checkoutStep === 1 && (
-            <>
-              <FaShoppingCart className={styles.cart__header_icon} />
-              <h2 className={styles.cart__title}>Корзина</h2>
-            </>
-          )}
-          {checkoutStep === 2 && (
-            <>
-              <FaCalendarAlt className={styles.cart__header_icon} />
-              <h2 className={styles.cart__title}>Оформление заказа</h2>
-            </>
-          )}
-          {checkoutStep === 3 && (
-            <>
-              <FaCheck className={styles.cart__header_icon} />
-              <h2 className={styles.cart__title}>Заказ оформлен</h2>
-            </>
-          )}
-          
-          <div className={styles.cart__steps}>
-            {[1, 2, 3].map((step) => (
-              <div 
-                key={step}
-                className={`${styles.cart__step_indicator} ${
-                  checkoutStep >= step ? styles.cart__step_indicator_active : ''
-                }`}
-              >
-                <span className={styles.cart__step_number}>{step}</span>
-                <span className={styles.cart__step_name}>
-                  {step === 1 ? 'Корзина' : 
-                   step === 2 ? 'Оформление' : 
-                   'Готово'}
-                </span>
-              </div>
-            ))}
+      <div className={styles.cart__overlay} onClick={closeCart} />
+      <div className={styles.cart__modal}>
+        <div className={styles.cart__modal_content}>
+          <div className={styles.cart__header}>
+            {checkoutStep === 1 && (
+              <>
+                <FaShoppingCart className={styles.cart__header_icon} />
+                <h2 className={styles.cart__title}>Корзина</h2>
+              </>
+            )}
+            {checkoutStep === 2 && (
+              <>
+                <FaCalendarAlt className={styles.cart__header_icon} />
+                <h2 className={styles.cart__title}>Оформление заказа</h2>
+              </>
+            )}
+            {checkoutStep === 3 && (
+              <>
+                <FaCheck className={styles.cart__header_icon} />
+                <h2 className={styles.cart__title}>Заказ оформлен</h2>
+              </>
+            )}
+            
+            <div className={styles.cart__steps}>
+              {[1, 2, 3].map((step) => (
+                <div 
+                  key={step}
+                  className={`${styles.cart__step_indicator} ${
+                    checkoutStep >= step ? styles.cart__step_indicator_active : ''
+                  }`}
+                >
+                  <span className={styles.cart__step_number}>{step}</span>
+                  <span className={styles.cart__step_name}>
+                    {step === 1 ? 'Корзина' : 
+                     step === 2 ? 'Оформление' : 
+                     'Готово'}
+                  </span>
+                </div>
+              ))}
+            </div>
+            
+            <button 
+              className={styles.cart__close}
+              onClick={closeCart}
+            >
+              <FaTimes />
+            </button>
           </div>
           
-          <button 
-            className={styles.cart__close}
-            onClick={closeCart}
-          >
-            <FaTimes />
-          </button>
-        </div>
-        
-        <div className={`${styles.cart__content} ${checkoutStep === 3 ? styles.cart__content_success : ''}`}>
-          <AnimatePresence
-            mode="wait"
-            initial={false}
-            custom={getDirection()}
-          >
-            {checkoutStep === 1 && renderCartStep()}
-            {checkoutStep === 2 && renderCheckoutStep()}
-            {checkoutStep === 3 && renderSuccessStep()}
-          </AnimatePresence>
-        </div>
-        
-        <div className={styles.cart__footer}>
-          {checkoutStep < 3 && (
-            <>
-              {checkoutStep > 1 && (
+          <div className={`${styles.cart__content} ${checkoutStep === 3 ? styles.cart__content_success : ''}`}>
+            <AnimatePresence mode="wait" initial={false}>
+              {checkoutStep === 1 && renderCartStep()}
+              {checkoutStep === 2 && renderCheckoutStep()}
+              {checkoutStep === 3 && renderSuccessStep()}
+            </AnimatePresence>
+          </div>
+          
+          <div className={styles.cart__footer}>
+            {checkoutStep < 3 && (
+              <>
+                {checkoutStep > 1 && (
+                  <button 
+                    className={styles.cart__back_btn}
+                    onClick={prevStep}
+                  >
+                    <FaArrowLeft className={styles.cart__btn_icon} />
+                    Назад
+                  </button>
+                )}
                 <button 
-                  className={styles.cart__back_btn}
-                  onClick={prevStep}
+                  className={styles.cart__next_btn}
+                  onClick={handleNextStep}
+                  disabled={cartItems.length === 0 && checkoutStep === 1}
                 >
-                  <FaArrowLeft className={styles.cart__btn_icon} />
-                  Назад
+                  {checkoutStep === 1 ? 'Оформить заказ' : 'Оплатить'}
+                  <FaArrowRight className={styles.cart__btn_icon} />
                 </button>
-              )}
-              <button 
-                className={styles.cart__next_btn}
-                onClick={handleNextStep}
-                disabled={cartItems.length === 0 && checkoutStep === 1}
-              >
-                {checkoutStep === 1 ? 'Оформить заказ' : 'Оплатить'}
-                <FaArrowRight className={styles.cart__btn_icon} />
-              </button>
-            </>
-          )}
+              </>
+            )}
+          </div>
         </div>
       </div>
     </ModalPortal>

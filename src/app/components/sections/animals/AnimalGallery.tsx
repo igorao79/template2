@@ -7,10 +7,13 @@ import Image from 'next/image';
 import styles from './AnimalGallery.module.scss';
 import { animals } from '@/app/data/animals';
 import AnimalModal from './AnimalModal';
+import AnimatedSection from '../../AnimatedSection';
+import { useAnimation } from '@/app/context/AnimationContext';
 
 const AnimalGallery = () => {
   const [selectedAnimal, setSelectedAnimal] = useState<typeof animals[0] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { canAnimate } = useAnimation();
 
   const handleAnimalClick = (animal: typeof animals[0]) => {
     setSelectedAnimal(animal);
@@ -30,6 +33,8 @@ const AnimalGallery = () => {
       opacity: 1,
       transition: {
         staggerChildren: 0.2,
+        // Only animate when loader is gone
+        delayChildren: canAnimate ? 0 : 0.5
       },
     },
   };
@@ -42,33 +47,26 @@ const AnimalGallery = () => {
   return (
     <section className={styles.animals} id="animals">
       <div className={styles.animals__container}>
-        <motion.div 
+        <AnimatedSection
           className={styles.animals__header}
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          animationClass="fadeIn"
         >
           <h2 className={styles.animals__title}>Наши животные</h2>
           <p className={styles.animals__description}>
             Познакомьтесь с удивительными обитателями нашего зоопарка. Нажмите на карточку животного, чтобы узнать больше интересных фактов!
           </p>
-        </motion.div>
+        </AnimatedSection>
 
-        <motion.div 
+        <AnimatedSection
           className={styles.animals__grid}
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
+          animationClass="fadeIn"
         >
           {animals.map((animal) => (
-            <motion.div 
+            <AnimatedSection
               key={animal.id}
               className={`${styles.animals__card} ${selectedAnimal?.id === animal.id && isModalOpen ? styles['animals__card--active'] : ''}`}
-              variants={cardVariants}
+              animationClass="slideInUp"
               onClick={() => handleAnimalClick(animal)}
-              whileHover={{ y: -10, transition: { duration: 0.2 } }}
             >
               <div className={styles.animals__image_container}>
                 <Image 
@@ -92,9 +90,9 @@ const AnimalGallery = () => {
                   <span>Подробнее</span>
                 </button>
               </div>
-            </motion.div>
+            </AnimatedSection>
           ))}
-        </motion.div>
+        </AnimatedSection>
 
         {/* Используем новый компонент модального окна */}
         <AnimalModal 

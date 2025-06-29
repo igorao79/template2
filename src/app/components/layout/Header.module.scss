@@ -8,7 +8,8 @@
   width: 100%;
   z-index: $z-index-fixed;
   transition: all 0.3s ease;
-  background-color: transparent;
+  background-color: #008060f2;
+  
   
   &--scrolled {
     background-color: rgba($primary-color, 0.95);

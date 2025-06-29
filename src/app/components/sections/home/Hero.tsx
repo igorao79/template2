@@ -3,12 +3,13 @@
 import { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import styles from './Hero.module.scss';
+import { useAnimation } from '@/app/context/AnimationContext';
 
 const Hero = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { canAnimate, hasScrolled } = useAnimation();
 
   useEffect(() => {
-    // Устанавливаем обработчик события загрузки видео
     if (videoRef.current) {
       videoRef.current.addEventListener('loadeddata', () => {
         if (videoRef.current) {
@@ -20,19 +21,18 @@ const Hero = () => {
 
   const scrollToAnimals = (e: React.MouseEvent) => {
     e.preventDefault();
-    // Only update URL, no scrolling
-    window.history.replaceState({}, '', '/animals');
+    const animalsSection = document.getElementById('animals');
+    animalsSection?.scrollIntoView({ behavior: 'smooth' });
   };
   
   const scrollToTickets = (e: React.MouseEvent) => {
     e.preventDefault();
-    // Only update URL, no scrolling
-    window.history.replaceState({}, '', '/tickets');
+    const ticketsSection = document.getElementById('tickets');
+    ticketsSection?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
     <section className={styles.hero}>
-      {/* Фоновое видео */}
       <div className={styles.hero__background}>
         <video 
           ref={videoRef}
@@ -48,12 +48,11 @@ const Hero = () => {
         <div className={styles.hero__overlay}></div>
       </div>
 
-      {/* Content */}
       <div className={styles.hero__content}>
         <motion.h1 
           className={styles.hero__title}
           initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={canAnimate && !hasScrolled ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
           transition={{ duration: 0.8 }}
         >
           Добро пожаловать в <span className={styles.hero__title_accent}>Зоопарк</span>
@@ -62,7 +61,7 @@ const Hero = () => {
         <motion.p 
           className={styles.hero__description}
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          animate={canAnimate && !hasScrolled ? { opacity: 1 } : { opacity: 0 }}
           transition={{ delay: 0.3, duration: 0.8 }}
         >
           Откройте для себя удивительный мир животных и незабываемые приключения для всей семьи.
@@ -71,7 +70,7 @@ const Hero = () => {
         <motion.div
           className={styles.hero__buttons}
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={canAnimate && !hasScrolled ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ delay: 0.5, duration: 0.8 }}
         >
           <a 
@@ -91,12 +90,11 @@ const Hero = () => {
         </motion.div>
       </div>
 
-      {/* Scroll Indicator */}
       <motion.div 
         className={styles.hero__scroll}
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1, duration: 0.5 }}
+        animate={canAnimate && !hasScrolled ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
         onClick={scrollToAnimals}
       >
         <div className={styles.hero__scroll_icon}>
