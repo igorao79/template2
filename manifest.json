@@ -1,21 +1,16 @@
 {
-  "name": "Zoo Website",
-  "short_name": "Zoo",
-  "description": "Explore our amazing zoo and its inhabitants",
-  "start_url": "/template2/",
+  "name": "Зоопарк",
+  "short_name": "Зоопарк",
+  "description": "Добро пожаловать в наш зоопарк",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4CAF50",
   "icons": [
     {
-      "src": "/template2/icons/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/template2/icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "/fav.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
     }
   ]
 } 
