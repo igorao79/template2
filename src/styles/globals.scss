@@ -169,6 +169,10 @@ img {
   max-width: 100%;
 }
 
+ul {
+  list-style: none;
+}
+
 .text-center {
   text-align: center;
 }
@@ -176,11 +180,6 @@ img {
 /* Глобальные стили для анимаций */
 .fadeIn {
   animation: fadeIn 1s ease forwards;
-  animation-play-state: var(--animation-enabled, paused);
-}
-
-.fadeInUp {
-  animation: fadeInUp 1s ease forwards;
   animation-play-state: var(--animation-enabled, paused);
 }
 
@@ -199,16 +198,6 @@ img {
   animation-play-state: var(--animation-enabled, paused);
 }
 
-.bounceIn {
-  animation: bounceIn 1s ease forwards;
-  animation-play-state: var(--animation-enabled, paused);
-}
-
-.zoomIn {
-  animation: zoomIn 0.8s ease forwards;
-  animation-play-state: var(--animation-enabled, paused);
-}
-
 /* Keyframes для анимаций */
 @keyframes fadeIn {
   from {
@@ -216,17 +205,6 @@ img {
   }
   to {
     opacity: 1;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -260,34 +238,6 @@ img {
   to {
     opacity: 1;
     transform: translateX(0);
-  }
-}
-
-@keyframes bounceIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.3);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-  70% {
-    transform: scale(0.9);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes zoomIn {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
   }
 }
 

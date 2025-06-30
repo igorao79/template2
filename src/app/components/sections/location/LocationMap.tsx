@@ -1,22 +1,16 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { FaMapMarkerAlt, FaBus, FaSubway, FaCar, FaPhone, FaClock, FaEnvelope } from 'react-icons/fa';
+import { FaBus, FaSubway, FaCar, FaPhone, FaClock, FaEnvelope } from 'react-icons/fa';
 import styles from './LocationMap.module.scss';
 import { useAnimation } from '../../../context/AnimationContext';
+import type { Map as LeafletMap } from 'leaflet';
 
-// Определяем тип для Leaflet, который будет доступен глобально
-declare global {
-  interface Window {
-    L: any;
-  }
-}
-
-// Расширяем HTMLDivElement для поддержки Leaflet
-interface LeafletElement extends HTMLDivElement {
-  _leaflet_id?: number;
-}
+// Импортируем иконки маркеров
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
 const transportOptions = [
   {
@@ -37,106 +31,116 @@ const transportOptions = [
     title: 'Автомобиль',
     routes: ['Платная парковка на территории зоопарка', 'Городская парковка по ул. Зоологическая']
   }
-];
+] as const;
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+} as const;
+
+const ContactInfo = memo(() => (
+  <div className={styles.location__contacts}>
+    <div className={styles.location__contact_item}>
+      <FaPhone />
+      <span>+7 (123) 456-78-90</span>
+    </div>
+    <div className={styles.location__contact_item}>
+      <FaEnvelope />
+      <span>info@zoopark.ru</span>
+    </div>
+    <div className={styles.location__contact_item}>
+      <FaClock />
+      <span>Ежедневно с 9:00 до 20:00</span>
+    </div>
+  </div>
+));
+
+ContactInfo.displayName = 'ContactInfo';
+
+const TransportCard = memo(({ option }: { option: typeof transportOptions[number] }) => (
+  <motion.div 
+    key={option.id}
+    className={`${styles.location__transport_card} ${option.id === 3 ? styles['location__transport_card--wide'] : ''}`}
+    variants={itemVariants}
+  >
+    <div className={styles.location__transport_icon}>
+      {option.icon}
+    </div>
+    <h4 className={styles.location__transport_option}>{option.title}</h4>
+    <ul className={styles.location__transport_routes}>
+      {option.routes.map((route, index) => (
+        <li key={index}>{route}</li>
+      ))}
+    </ul>
+  </motion.div>
+));
+
+TransportCard.displayName = 'TransportCard';
 
 const LocationMap = () => {
-  const mapRef = useRef<HTMLDivElement | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<LeafletMap | null>(null);
   const mapInitialized = useRef<boolean>(false);
   const { canAnimate } = useAnimation();
   
-  // Refs для отслеживания видимости элементов
   const headerRef = useRef(null);
   const transportRef = useRef(null);
   
-  // Определяем, видны ли элементы
   const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
   const transportInView = useInView(transportRef, { once: true, amount: 0.1 });
 
   useEffect(() => {
-    // Проверяем, что карта еще не инициализирована
-    if (mapInitialized.current) {
-      console.log('Map already initialized, skipping');
-      return;
-    }
-    
-    // Добавляем скрипт OpenStreetMap на страницу
-    const scriptId = 'leaflet-script';
-    const linkId = 'leaflet-css';
-    let script = document.getElementById(scriptId) as HTMLScriptElement;
-    let link = document.getElementById(linkId) as HTMLLinkElement;
-    
-    // Проверяем, есть ли уже скрипт и стили на странице
-    if (!script) {
-      script = document.createElement('script');
-      script.id = scriptId;
-      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
-      script.crossOrigin = '';
-      script.async = true;
-      document.body.appendChild(script);
-    }
-    
-    if (!link) {
-      link = document.createElement('link');
-      link.id = linkId;
+    if (!mapContainerRef.current || mapInitialized.current) return;
+
+    const initMap = async () => {
+      const L = (await import('leaflet')).default;
+      const link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-      link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
-      link.crossOrigin = '';
       document.head.appendChild(link);
-    }
-    
-    // Инициализируем карту после загрузки скрипта
-    const initMap = () => {
-      if (mapRef.current && window.L && !mapInitialized.current) {
-        // Координаты зоопарка (пример, замените на реальные)
-        const zooLatitude = 55.7558;
-        const zooLongitude = 37.6173;
-        
-        // Создаем карту
-        const map = window.L.map(mapRef.current).setView([zooLatitude, zooLongitude], 15);
-        
-        // Добавляем тайлы OpenStreetMap
-        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-        
-        // Добавляем маркер зоопарка
-        const zooMarker = window.L.marker([zooLatitude, zooLongitude]).addTo(map);
-        zooMarker.bindPopup("<b>Наш зоопарк</b><br>Добро пожаловать!").openPopup();
-        
-        // Помечаем карту как инициализированную
+
+      // Исправляем иконки маркеров
+      L.Icon.Default.mergeOptions({
+        iconUrl: markerIcon.src,
+        iconRetinaUrl: markerIcon2x.src,
+        shadowUrl: markerShadow.src,
+      });
+
+      if (mapContainerRef.current) {
+        const map = L.map(mapContainerRef.current).setView([55.7558, 37.6173], 13);
+        mapInstanceRef.current = map;
         mapInitialized.current = true;
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        L.marker([55.7558, 37.6173])
+          .addTo(map)
+          .bindPopup('Наш зоопарк');
       }
     };
-    
-    if (window.L) {
-      // Если Leaflet уже загружен, сразу инициализируем карту
-      initMap();
-    } else if (script) {
-      // Иначе ждем загрузки скрипта
-      script.onload = initMap;
-    }
-    
-    // Не удаляем скрипты и стили при размонтировании, 
-    // так как они могут использоваться повторно
-    return () => {};
+
+    initMap();
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+        mapInitialized.current = false;
+      }
+    };
   }, []);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
 
   return (
     <section className={styles.location} id="location">
@@ -158,25 +162,15 @@ const LocationMap = () => {
 
         <div className={styles.location__content}>
           <div className={styles.location__map_container}>
-            <div ref={mapRef} className={styles.location__map}></div>
+            <div 
+              ref={mapContainerRef}
+              className={styles.location__map}
+            ></div>
             
             <div className={styles.location__address}>
               <h3>Наш адрес</h3>
               <p>г. Москва, ул. Зоологическая, д. 13</p>
-              <div className={styles.location__contacts}>
-                <div className={styles.location__contact_item}>
-                  <FaPhone />
-                  <span>+7 (123) 456-78-90</span>
-                </div>
-                <div className={styles.location__contact_item}>
-                  <FaEnvelope />
-                  <span>info@zoopark.ru</span>
-                </div>
-                <div className={styles.location__contact_item}>
-                  <FaClock />
-                  <span>Ежедневно с 9:00 до 20:00</span>
-                </div>
-              </div>
+              <ContactInfo />
             </div>
           </div>
           
@@ -192,23 +186,7 @@ const LocationMap = () => {
             
             <div className={styles.location__transport_grid}>
               {transportOptions.map((option) => (
-                <motion.div 
-                  key={option.id}
-                  className={`${styles.location__transport_card} ${option.id === 3 ? styles['location__transport_card--wide'] : ''}`}
-                  variants={itemVariants}
-                >
-                  <div className={styles.location__transport_icon}>
-                    {option.icon}
-                  </div>
-                  <h4 className={styles.location__transport_name}>{option.title}</h4>
-                  <ul className={styles.location__transport_list}>
-                    {option.routes.map((route, index) => (
-                      <li key={index} className={styles.location__transport_item}>
-                        {route}
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
+                <TransportCard key={option.id} option={option} />
               ))}
             </div>
           </motion.div>
@@ -218,4 +196,4 @@ const LocationMap = () => {
   );
 };
 
-export default LocationMap; 
+export default memo(LocationMap); 

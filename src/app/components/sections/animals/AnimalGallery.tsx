@@ -1,19 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { FaPaw, FaInfoCircle } from 'react-icons/fa';
 import Image from 'next/image';
 import styles from './AnimalGallery.module.scss';
-import { animals } from '@/app/data/animals';
+import { FaPaw, FaInfoCircle } from 'react-icons/fa';
 import AnimalModal from './AnimalModal';
 import AnimatedSection from '../../AnimatedSection';
-import { useAnimation } from '@/app/context/AnimationContext';
+import { animals } from '@/app/data/animals';
 
 const AnimalGallery = () => {
   const [selectedAnimal, setSelectedAnimal] = useState<typeof animals[0] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { canAnimate } = useAnimation();
 
   const handleAnimalClick = (animal: typeof animals[0]) => {
     setSelectedAnimal(animal);
@@ -25,23 +22,6 @@ const AnimalGallery = () => {
     setTimeout(() => {
       setSelectedAnimal(null);
     }, 300);
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        // Only animate when loader is gone
-        delayChildren: canAnimate ? 0 : 0.5
-      },
-    },
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
   return (

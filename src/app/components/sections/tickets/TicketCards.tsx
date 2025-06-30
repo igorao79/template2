@@ -1,13 +1,21 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useCallback, memo } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { FaTicketAlt, FaCheck, FaUser, FaChild, FaUsers, FaUserTie } from 'react-icons/fa';
+import { FaTicketAlt, FaCheck, FaUser, FaChild, FaUserTie } from 'react-icons/fa';
 import styles from './TicketCards.module.scss';
 import { useCart } from '@/app/context/CartContext';
 import { useAnimation } from '../../../context/AnimationContext';
 
-const tickets = [
+type Ticket = {
+  id: number;
+  type: string;
+  price: number;
+  description: string;
+  features: string[];
+};
+
+const tickets: Ticket[] = [
   {
     id: 1,
     type: 'Взрослый',
@@ -58,47 +66,94 @@ const renderTicketIcon = (iconType: string) => {
   }
 };
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+} as const;
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+} as const;
+
+const TicketFeatures = memo(({ features }: { features: string[] }) => (
+  <div className={styles.tickets__features}>
+    <ul className={styles.tickets__list}>
+      {features.map((feature, index) => (
+        <li key={index} className={styles.tickets__item}>
+          <FaCheck className={styles.tickets__check} />
+          <span>{feature}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+));
+
+TicketFeatures.displayName = 'TicketFeatures';
+
+interface TicketCardProps {
+  ticket: Ticket;
+  onBuyTicket: (ticket: Ticket) => void;
+  canAnimate: boolean;
+  gridInView: boolean;
+}
+
+const TicketCard = memo(({ ticket, onBuyTicket, canAnimate, gridInView }: TicketCardProps) => (
+  <motion.div 
+    className={`${styles.tickets__card} ${ticket.id === 3 ? styles['tickets__card--wide'] : ''}`}
+    variants={cardVariants}
+    whileHover={(canAnimate && gridInView) ? { y: -10, transition: { duration: 0.2 } } : {}}
+  >
+    <div className={styles.tickets__card_header}>
+      {renderTicketIcon(getTicketIcon(ticket.type))}
+      <h3 className={styles.tickets__type}>{ticket.type}</h3>
+      <p className={styles.tickets__price}>{ticket.price} ₽</p>
+      <p className={styles.tickets__description}>{ticket.description}</p>
+    </div>
+    
+    <TicketFeatures features={ticket.features} />
+    
+    <button 
+      className={styles.tickets__button}
+      onClick={() => onBuyTicket(ticket)}
+    >
+      Купить билет
+    </button>
+  </motion.div>
+));
+
+TicketCard.displayName = 'TicketCard';
+
 const TicketCards = () => {
   const { addToCart } = useCart();
   const { canAnimate } = useAnimation();
   
-  // Refs для отслеживания видимости элементов
   const headerRef = useRef(null);
   const gridRef = useRef(null);
   
-  // Определяем, видны ли элементы
   const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
   const gridInView = useInView(gridRef, { once: true, amount: 0.1 });
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
-
-  const handleBuyTicket = (ticket: typeof tickets[0]) => {
+  const handleBuyTicket = useCallback((ticket: Ticket) => {
     console.log('TicketCards: Добавление билета в корзину:', ticket.type);
-    const cartTicket = {
+    const cartItem = {
       id: ticket.id,
       name: ticket.type,
       price: ticket.price,
       description: ticket.description,
       type: getTicketTypeForCart(ticket.type),
-      iconType: getTicketIcon(ticket.type)
+      iconType: 'ticket' as const,
+      quantity: 1
     };
     
-    console.log('TicketCards: Данные билета для корзины:', cartTicket);
-    addToCart(cartTicket, 1);
-  };
+    console.log('TicketCards: Данные билета для корзины:', cartItem);
+    addToCart(cartItem);
+  }, [addToCart]);
 
   return (
     <section className={styles.tickets} id="tickets">
@@ -124,37 +179,13 @@ const TicketCards = () => {
           animate={(canAnimate && gridInView) ? "visible" : "hidden"}
         >
           {tickets.map((ticket) => (
-            <motion.div 
+            <TicketCard
               key={ticket.id}
-              className={`${styles.tickets__card} ${ticket.id === 3 ? styles['tickets__card--wide'] : ''}`}
-              variants={cardVariants}
-              whileHover={(canAnimate && gridInView) ? { y: -10, transition: { duration: 0.2 } } : {}}
-            >
-              <div className={styles.tickets__card_header}>
-                {renderTicketIcon(getTicketIcon(ticket.type))}
-                <h3 className={styles.tickets__type}>{ticket.type}</h3>
-                <p className={styles.tickets__price}>{ticket.price} ₽</p>
-                <p className={styles.tickets__description}>{ticket.description}</p>
-              </div>
-              
-              <div className={styles.tickets__features}>
-                <ul className={styles.tickets__list}>
-                  {ticket.features.map((feature, index) => (
-                    <li key={index} className={styles.tickets__item}>
-                      <FaCheck className={styles.tickets__check} />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              
-              <button 
-                className={styles.tickets__button}
-                onClick={() => handleBuyTicket(ticket)}
-              >
-                Купить билет
-              </button>
-            </motion.div>
+              ticket={ticket}
+              onBuyTicket={handleBuyTicket}
+              canAnimate={canAnimate}
+              gridInView={gridInView}
+            />
           ))}
         </motion.div>
         
@@ -167,4 +198,4 @@ const TicketCards = () => {
   );
 };
 
-export default TicketCards; 
+export default memo(TicketCards); 

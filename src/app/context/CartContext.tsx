@@ -12,7 +12,12 @@ export type Ticket = {
 };
 
 export type CartItem = {
-  ticket: Ticket;
+  id: number;
+  name: string;
+  price: number;
+  description: string;
+  type: 'adult' | 'child' | 'family' | 'senior' | 'event';
+  iconType: 'ticket' | 'event';
   quantity: number;
 };
 
@@ -22,22 +27,22 @@ export type OrderInfo = {
   paymentMethod: 'card' | 'paypal' | 'applepay' | null;
 };
 
-type CartContextType = {
-  cartItems: CartItem[];
-  orderInfo: OrderInfo;
+export type CartContextType = {
   isCartOpen: boolean;
-  checkoutStep: number;
-  addToCart: (ticket: Ticket, quantity: number) => void;
-  removeFromCart: (ticketId: number) => void;
-  updateQuantity: (ticketId: number, quantity: number) => void;
-  clearCart: () => void;
   openCart: () => void;
   closeCart: () => void;
-  setOrderInfo: (info: Partial<OrderInfo>) => void;
+  cartItems: CartItem[];
+  addToCart: (item: CartItem) => void;
+  removeFromCart: (itemId: number) => void;
+  updateQuantity: (itemId: number, quantity: number) => void;
+  clearCart: () => void;
+  totalAmount: number;
+  checkoutStep: number;
   nextStep: () => void;
   prevStep: () => void;
   resetCheckout: () => void;
-  totalQuantity: number;
+  orderInfo: OrderInfo;
+  setOrderInfo: (info: Partial<OrderInfo>) => void;
   totalPrice: number;
 };
 
@@ -47,7 +52,7 @@ const defaultOrderInfo: OrderInfo = {
   paymentMethod: null,
 };
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
+const CartContext = createContext<CartContextType | null>(null);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -56,14 +61,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [checkoutStep, setCheckoutStep] = useState(1);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Загружаем корзину из localStorage только один раз при инициализации
   useEffect(() => {
     const loadCart = () => {
       try {
-        const savedCart = localStorage.getItem('zoo-cart');
+        const savedCart = localStorage.getItem('cart');
         if (savedCart) {
           const parsedCart = JSON.parse(savedCart);
-          // Проверяем, что это массив и в нем есть элементы
           if (Array.isArray(parsedCart) && parsedCart.length > 0) {
             console.log('Загружены элементы корзины:', parsedCart.length);
             setCartItems(parsedCart);
@@ -71,7 +74,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         }
       } catch (error) {
         console.error('Ошибка при загрузке корзины:', error);
-        localStorage.removeItem('zoo-cart'); // Сбрасываем поврежденные данные
+        localStorage.removeItem('cart');
       } finally {
         setIsInitialized(true);
       }
@@ -80,58 +83,54 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     loadCart();
   }, []);
 
-  // Сохраняем корзину при изменении, но только после инициализации
   useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem('zoo-cart', JSON.stringify(cartItems));
+    if (isInitialized && cartItems.length > 0) {
+      localStorage.setItem('cart', JSON.stringify(cartItems));
       console.log('Сохранено элементов в корзине:', cartItems.length);
     }
   }, [cartItems, isInitialized]);
 
-  const totalQuantity = cartItems.reduce((total, item) => total + item.quantity, 0);
-  const totalPrice = cartItems.reduce(
-    (total, item) => total + item.ticket.price * item.quantity,
-    0
-  );
+  const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
-  const addToCart = (ticket: Ticket, quantity: number) => {
-    console.log('Добавление в корзину:', ticket.name, quantity);
+  const addToCart = (item: CartItem) => {
+    console.log('Добавление в корзину:', item.name, item.quantity);
     setCartItems((prevItems) => {
-      const existingItemIndex = prevItems.findIndex((item) => item.ticket.id === ticket.id);
+      const existingItemIndex = prevItems.findIndex((i) => i.id === item.id);
       
       if (existingItemIndex !== -1) {
         const updatedItems = [...prevItems];
-        updatedItems[existingItemIndex].quantity += quantity;
+        const existingItem = updatedItems[existingItemIndex];
+        updatedItems[existingItemIndex] = {
+          ...existingItem,
+          quantity: existingItem.quantity + item.quantity
+        };
         return updatedItems;
       } else {
-        return [...prevItems, { ticket, quantity }];
+        return [...prevItems, item];
       }
     });
     setIsCartOpen(true);
   };
 
-  const removeFromCart = (ticketId: number) => {
-    console.log('Удаление из корзины ID:', ticketId);
-    setCartItems((prevItems) => prevItems.filter((item) => item.ticket.id !== ticketId));
+  const removeFromCart = (itemId: number) => {
+    console.log('Удаление из корзины ID:', itemId);
+    setCartItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
   };
 
-  const updateQuantity = (ticketId: number, quantity: number) => {
-    console.log('Обновление количества ID:', ticketId, 'Новое количество:', quantity);
-    if (quantity <= 0) {
-      removeFromCart(ticketId);
-      return;
+  const updateQuantity = (itemId: number, quantity: number) => {
+    if (quantity > 0) {
+      setCartItems((prevItems) =>
+        prevItems.map((item) =>
+          item.id === itemId ? { ...item, quantity } : item
+        )
+      );
     }
-
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.ticket.id === ticketId ? { ...item, quantity } : item
-      )
-    );
   };
 
   const clearCart = () => {
     console.log('Очистка корзины');
     setCartItems([]);
+    localStorage.removeItem('cart');
   };
 
   const openCart = () => {
@@ -153,7 +152,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const nextStep = () => {
-    setCheckoutStep((prev) => prev + 1);
+    setCheckoutStep((prev) => Math.min(prev + 1, 3));
   };
 
   const prevStep = () => {
@@ -169,7 +168,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     <CartContext.Provider
       value={{
         cartItems,
-        orderInfo,
         isCartOpen,
         checkoutStep,
         addToCart,
@@ -178,12 +176,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         clearCart,
         openCart,
         closeCart,
-        setOrderInfo,
         nextStep,
         prevStep,
         resetCheckout,
-        totalQuantity,
-        totalPrice,
+        totalAmount,
+        orderInfo,
+        setOrderInfo,
+        totalPrice: totalAmount
       }}
     >
       {children}
@@ -193,7 +192,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useCart must be used within a CartProvider');
   }
   return context;

@@ -1,28 +1,28 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { FaBars, FaTimes, FaShoppingCart } from 'react-icons/fa';
 import styles from './Header.module.scss';
 import { useCart } from '@/app/context/CartContext';
+import { useNavigation } from '@/app/hooks/useNavigation';
+
+const navLinks = [
+  { href: '#home', id: 'home', label: 'Главная' },
+  { href: '#animals', id: 'animals', label: 'Животные' },
+  { href: '#tickets', id: 'tickets', label: 'Билеты' },
+  { href: '#events', id: 'events', label: 'События' },
+  { href: '#location', id: 'location', label: 'Как добраться' },
+] as const;
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('home');
-  const { openCart, totalQuantity } = useCart();
+  const { cartItems, openCart } = useCart();
+  const totalQuantity = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const { activeSection, handleNavigation } = useNavigation();
 
   const handleScroll = useCallback(() => {
-    const currentScrollY = window.scrollY;
-    
-    if (currentScrollY > 50) {
-      setIsScrolled(true);
-    } else {
-      setIsScrolled(false);
-    }
-    
-    setLastScrollY(currentScrollY);
+    setIsScrolled(window.scrollY > 50);
   }, []);
 
   useEffect(() => {
@@ -31,37 +31,6 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
-  const scrollToSection = (e: React.MouseEvent, sectionId: string) => {
-    e.preventDefault();
-    
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const header = document.querySelector('header');
-      const headerHeight = header ? header.offsetHeight : 0;
-      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
-      const offsetPosition = elementPosition - headerHeight;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-
-      setActiveSection(sectionId);
-    }
-    
-    if (mobileMenuOpen) {
-      setMobileMenuOpen(false);
-    }
-  };
-
-  const navLinks = [
-    { href: '#home', id: 'home', label: 'Главная' },
-    { href: '#animals', id: 'animals', label: 'Животные' },
-    { href: '#tickets', id: 'tickets', label: 'Билеты' },
-    { href: '#events', id: 'events', label: 'События' },
-    { href: '#location', id: 'location', label: 'Как добраться' },
-  ];
-
   return (
     <header 
       className={`${styles.header} ${isScrolled ? styles['header--scrolled'] : styles['header--transparent']}`}
@@ -69,7 +38,7 @@ const Header = () => {
       <div className={styles.header__container}>
         <a 
           href="#home" 
-          onClick={(e) => scrollToSection(e, 'home')}
+          onClick={(e) => handleNavigation(e, 'home')}
           className={styles.header__logo}
         >
           Зоопарк
@@ -83,7 +52,10 @@ const Header = () => {
               <li key={link.href}>
                 <a 
                   href={link.href} 
-                  onClick={(e) => scrollToSection(e, link.id)}
+                  onClick={(e) => {
+                    handleNavigation(e, link.id);
+                    setMobileMenuOpen(false);
+                  }}
                   className={`
                     ${styles['header__nav-item']} 
                     ${isScrolled 
@@ -106,6 +78,7 @@ const Header = () => {
           <button 
             className={styles.header__cart}
             onClick={openCart}
+            aria-label="Открыть корзину"
           >
             <FaShoppingCart />
             {totalQuantity > 0 && (
@@ -117,7 +90,7 @@ const Header = () => {
           <button 
             className={styles['header__mobile-button']}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Открыть меню"
+            aria-label={mobileMenuOpen ? "Закрыть меню" : "Открыть меню"}
           >
             {mobileMenuOpen ? <FaTimes /> : <FaBars />}
           </button>
@@ -131,7 +104,10 @@ const Header = () => {
                 <li key={link.href}>
                   <a 
                     href={link.href} 
-                    onClick={(e) => scrollToSection(e, link.id)}
+                    onClick={(e) => {
+                      handleNavigation(e, link.id);
+                      setMobileMenuOpen(false);
+                    }}
                     className={`
                       ${styles['header__mobile-item']}
                       ${activeSection === link.id ? styles['header__mobile-item--active'] : ''}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo, useCallback, memo } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaTicketAlt, FaShoppingCart } from 'react-icons/fa';
 import Image from 'next/image';
@@ -95,34 +95,117 @@ const categories = [
   { id: 'special', name: 'Специальные' }
 ];
 
+const EventCard = memo(({ event, addedToCart, onAddToCart, onScrollToTickets }: {
+  event: Event;
+  addedToCart: boolean;
+  onAddToCart: (event: Event) => void;
+  onScrollToTickets: () => void;
+}) => (
+  <motion.div 
+    className={styles.events__card}
+    variants={{
+      hidden: { opacity: 0, y: 30 },
+      visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+    }}
+  >
+    <div className={styles.events__image_container}>
+      <Image 
+        src={event.image} 
+        alt={event.title} 
+        className={styles.events__image}
+        width={500}
+        height={300}
+        quality={85}
+        sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, 33vw"
+        priority={event.id === 1}
+        loading={event.id === 1 ? "eager" : "lazy"}
+      />
+      <div className={styles.events__overlay}></div>
+      <div className={styles.events__badge}>
+        {event.price} ₽
+      </div>
+    </div>
+    
+    <div className={styles.events__content}>
+      <h3 className={styles.events__event_title}>{event.title}</h3>
+      <p className={styles.events__event_description}>{event.description}</p>
+      
+      <div className={styles.events__details}>
+        <div className={styles.events__detail}>
+          <FaCalendarAlt />
+          <span>{new Date(event.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}</span>
+        </div>
+        
+        <div className={styles.events__detail}>
+          <FaClock />
+          <span>{event.time}</span>
+        </div>
+        
+        <div className={styles.events__detail}>
+          <FaMapMarkerAlt />
+          <span>{event.location}</span>
+        </div>
+      </div>
+      
+      <div className={styles.events__actions}>
+        <button 
+          className={`${styles.events__ticket_button} ${addedToCart ? styles.events__ticket_button_added : ''}`}
+          onClick={() => onAddToCart(event)}
+          disabled={addedToCart}
+        >
+          {addedToCart ? (
+            <>
+              <FaShoppingCart />
+              <span>Добавлено</span>
+            </>
+          ) : (
+            <>
+              <FaTicketAlt />
+              <span>Купить билет</span>
+            </>
+          )}
+        </button>
+        
+        <button 
+          className={styles.events__more_button}
+          onClick={onScrollToTickets}
+        >
+          <span>Перейти к билетам</span>
+          <Arrow size={20} className={styles.events__arrow} />
+        </button>
+      </div>
+    </div>
+  </motion.div>
+));
+
+EventCard.displayName = 'EventCard';
+
 const EventsCalendar = () => {
   const { addToCart } = useCart();
   const { canAnimate } = useAnimation();
   const [activeCategory, setActiveCategory] = useState('all');
   const [addedToCart, setAddedToCart] = useState<Record<number, boolean>>({});
   
-  // Refs для отслеживания видимости элементов
   const headerRef = useRef(null);
   const filterRef = useRef(null);
   const gridRef = useRef(null);
   
-  // Определяем, видны ли элементы
   const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
   const filterInView = useInView(filterRef, { once: true, amount: 0.3 });
   const gridInView = useInView(gridRef, { once: true, amount: 0.1 });
 
-  const filteredEvents = activeCategory === 'all' 
+  const filteredEvents = useMemo(() => 
+    activeCategory === 'all' 
     ? events 
-    : events.filter(event => event.category === activeCategory);
+      : events.filter(event => event.category === activeCategory),
+    [activeCategory]
+  );
 
-  const handleScrollToTickets = () => {
+  const handleScrollToTickets = useCallback(() => {
     const ticketsSection = document.getElementById('tickets');
     if (ticketsSection) {
-      // Get the header height to offset the scroll position
       const header = document.querySelector('header');
       const headerHeight = header ? header.offsetHeight : 0;
-      
-      // Calculate the position to scroll to
       const position = ticketsSection.offsetTop - headerHeight;
       
       window.scrollTo({
@@ -130,25 +213,27 @@ const EventsCalendar = () => {
         behavior: 'smooth'
       });
     }
-  };
+  }, []);
 
-  const handleAddToCart = (event: Event) => {
-    addToCart({
-      id: event.id + 1000, // Уникальный ID для событий
+  const handleAddToCart = useCallback((event: Event) => {
+    const cartItem = {
+      id: event.id + 1000,
       name: `Билет на: ${event.title}`,
-      price: event.price, // Теперь price уже число
+      price: event.price,
       description: `${new Date(event.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}, ${event.time}`,
-      type: 'event' as 'adult' | 'child' | 'family' | 'senior', // Тип для билетов на события
-      iconType: 'ticket'
-    }, 1);
+      type: 'event' as const,
+      iconType: 'event' as const,
+      quantity: 1
+    };
+    
+    addToCart(cartItem);
 
     setAddedToCart(prev => ({ ...prev, [event.id]: true }));
     
-    // Сбросить статус "добавлено в корзину" через 3 секунды
     setTimeout(() => {
       setAddedToCart(prev => ({ ...prev, [event.id]: false }));
     }, 3000);
-  };
+  }, [addToCart]);
 
   return (
     <section className={styles.events} id="events">
@@ -201,82 +286,13 @@ const EventsCalendar = () => {
           animate={(canAnimate && gridInView) ? "visible" : "hidden"}
         >
           {filteredEvents.map(event => (
-            <motion.div 
+            <EventCard
               key={event.id}
-              className={styles.events__card}
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-              }}
-            >
-              <div className={styles.events__image_container}>
-                <Image 
-                  src={event.image} 
-                  alt={event.title} 
-                  className={styles.events__image}
-                  width={500}
-                  height={300}
-                  quality={85}
-                  sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, 33vw"
-                  priority={event.id === 1}
-                  loading={event.id === 1 ? "eager" : "lazy"}
-                />
-                <div className={styles.events__overlay}></div>
-                <div className={styles.events__badge}>
-                  {event.price} ₽
-                </div>
-              </div>
-              
-              <div className={styles.events__content}>
-                <h3 className={styles.events__event_title}>{event.title}</h3>
-                <p className={styles.events__event_description}>{event.description}</p>
-                
-                <div className={styles.events__details}>
-                  <div className={styles.events__detail}>
-                    <FaCalendarAlt />
-                    <span>{new Date(event.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}</span>
-                  </div>
-                  
-                  <div className={styles.events__detail}>
-                    <FaClock />
-                    <span>{event.time}</span>
-                  </div>
-                  
-                  <div className={styles.events__detail}>
-                    <FaMapMarkerAlt />
-                    <span>{event.location}</span>
-                  </div>
-                </div>
-                
-                <div className={styles.events__actions}>
-                  <button 
-                    className={`${styles.events__ticket_button} ${addedToCart[event.id] ? styles.events__ticket_button_added : ''}`}
-                    onClick={() => handleAddToCart(event)}
-                    disabled={addedToCart[event.id]}
-                  >
-                    {addedToCart[event.id] ? (
-                      <>
-                        <FaShoppingCart />
-                        <span>Добавлено</span>
-                      </>
-                    ) : (
-                      <>
-                        <FaTicketAlt />
-                        <span>Купить билет</span>
-                      </>
-                    )}
-                  </button>
-                  
-                  <button 
-                    className={styles.events__more_button}
-                    onClick={handleScrollToTickets}
-                  >
-                    <span>Перейти к билетам</span>
-                    <Arrow size={20} className={styles.events__arrow} />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
+              event={event}
+              addedToCart={!!addedToCart[event.id]}
+              onAddToCart={handleAddToCart}
+              onScrollToTickets={handleScrollToTickets}
+            />
           ))}
         </motion.div>
       </div>
@@ -284,4 +300,4 @@ const EventsCalendar = () => {
   );
 };
 
-export default EventsCalendar; 
+export default memo(EventsCalendar);

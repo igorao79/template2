@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, memo } from 'react';
 import styles from './MainLayout.module.scss';
 import CartModal from '../cart/CartModal';
 import { useAnimation } from '@/app/context/AnimationContext';
@@ -22,4 +22,4 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   );
 };
 
-export default MainLayout; 
+export default memo(MainLayout); 

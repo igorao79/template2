@@ -118,44 +118,123 @@
   }
   
   &__transport {
-    margin-top: 20px;
+    margin-top: 40px;
   }
   
   &__transport_title {
     font-size: 1.8rem;
-    color: $primary-color;
+    font-weight: 700;
     margin-bottom: 25px;
-    font-weight: 600;
+    color: $primary-color;
     text-align: center;
   }
   
   &__transport_grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-top: 20px;
+
+    @media (max-width: 992px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 576px) {
+      grid-template-columns: 1fr;
+    }
   }
   
   &__transport_card {
-    background-color: white;
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    background: linear-gradient(145deg, #ffffff, #f5f7fa);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 
+      0 10px 20px rgba(0, 0, 0, 0.04),
+      0 2px 6px rgba(0, 0, 0, 0.04),
+      0 0 1px rgba(0, 0, 0, 0.04);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    align-items: flex-start;
+    text-align: left;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: $primary-color;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
     
     &:hover {
       transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.08),
+        0 4px 12px rgba(0, 0, 0, 0.06),
+        0 0 2px rgba(0, 0, 0, 0.04);
+
+      &::before {
+        opacity: 1;
+      }
     }
   }
   
   &__transport_icon {
     font-size: 2.5rem;
     color: $primary-color;
+    margin-bottom: 20px;
+    background: rgba($primary-color, 0.1);
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  &__transport_option {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: $text-color-primary;
     margin-bottom: 15px;
+    width: 100%;
+  }
+  
+  &__transport_routes {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+
+    li {
+      font-size: 1rem;
+      color: $text-color-secondary;
+      line-height: 1.6;
+      margin-bottom: 12px;
+      padding-left: 24px;
+      position: relative;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 8px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: $primary-color;
+        opacity: 0.6;
+      }
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
   }
   
   &__transport_name {
@@ -173,13 +252,27 @@
   }
   
   &__transport_item {
-    margin-bottom: 10px;
-    font-size: 0.95rem;
-    color: $text-color-secondary;
-    
-    &:last-child {
-      margin-bottom: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
     }
+  }
+  
+  &__transport_content {
+    flex-grow: 1;
+  }
+  
+  &__transport_description {
+    font-size: 0.9rem;
+    color: var(--text-color-secondary);
+    line-height: 1.4;
   }
 }
 
@@ -204,26 +297,34 @@
     }
     
     &__transport_grid {
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 15px;
+      gap: 20px;
     }
     
     &__transport_card {
-      padding: 20px 15px;
+      padding: 25px;
     }
     
     &__transport_icon {
       font-size: 2rem;
-      margin-bottom: 10px;
+      padding: 12px;
+      margin-bottom: 15px;
     }
     
-    &__transport_name {
-      font-size: 1.1rem;
-      margin-bottom: 10px;
+    &__transport_option {
+      font-size: 1.2rem;
     }
     
     &__map {
       height: 350px;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .location {
+    &__transport_title {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
     }
   }
 }

@@ -1,24 +1,22 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo } from 'react';
 import styles from './LoadingScreen.module.scss';
 import { useAnimation } from '@/app/context/AnimationContext';
 
-export default function LoadingScreen() {
+const LoadingScreen = () => {
   const loaderRef = useRef<HTMLDivElement>(null);
   const { isLoading } = useAnimation();
 
   useEffect(() => {
-    // Показываем body сразу
     document.body.style.opacity = '1';
     
     if (!isLoading && loaderRef.current) {
       loaderRef.current.classList.add(styles.fadeOut);
       
-      // Удаляем элемент после завершения анимации
       const removeTimer = setTimeout(() => {
         loaderRef.current?.remove();
-      }, 800); // 800ms - время анимации fadeOut
+      }, 800);
 
       return () => clearTimeout(removeTimer);
     }
@@ -34,4 +32,6 @@ export default function LoadingScreen() {
       </div>
     </div>
   );
-} 
+};
+
+export default memo(LoadingScreen);

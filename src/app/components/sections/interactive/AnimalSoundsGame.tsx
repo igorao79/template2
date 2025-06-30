@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { FaVolumeUp, FaStar, FaRedo } from 'react-icons/fa';
 import { getAssetPath } from '@/app/utils/paths';

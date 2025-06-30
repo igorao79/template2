@@ -1,29 +1,112 @@
 'use client';
 
 import Link from 'next/link';
+import { memo } from 'react';
 import { FaFacebook, FaTwitter, FaInstagram, FaYoutube, FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import styles from './Footer.module.scss';
 
+const footerVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      staggerChildren: 0.1,
+    },
+  },
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 },
+} as const;
+
+const socialLinks = [
+  { href: 'https://facebook.com', icon: FaFacebook, label: 'Facebook' },
+  { href: 'https://twitter.com', icon: FaTwitter, label: 'Twitter' },
+  { href: 'https://instagram.com', icon: FaInstagram, label: 'Instagram' },
+  { href: 'https://youtube.com', icon: FaYoutube, label: 'YouTube' },
+] as const;
+
+const quickLinks = [
+  { href: '/', label: 'Главная' },
+  { href: '/animals', label: 'Животные' },
+  { href: '/tickets', label: 'Билеты' },
+  { href: '/events', label: 'События' },
+  { href: '/location', label: 'Как добраться' },
+] as const;
+
+const workingHours = [
+  { days: 'Понедельник - Пятница', hours: '9:00 - 18:00' },
+  { days: 'Суббота', hours: '9:00 - 19:00' },
+  { days: 'Воскресенье', hours: '10:00 - 19:00' },
+] as const;
+
+const contactInfo = [
+  { icon: FaMapMarkerAlt, text: 'ул. Зоологическая, 123, г. Москва, 123456' },
+  { icon: FaPhone, text: '+7 (123) 456-7890' },
+  { icon: FaEnvelope, text: 'info@zoopark.ru' },
+] as const;
+
+const SocialLinks = memo(() => (
+  <div className={styles.footer__social}>
+    {socialLinks.map(({ href, icon: Icon, label }) => (
+      <a key={href} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}>
+        <Icon className={styles['footer__social-link']} />
+      </a>
+    ))}
+  </div>
+));
+
+SocialLinks.displayName = 'SocialLinks';
+
+const QuickLinks = memo(() => (
+  <ul className={styles['footer__links-list']}>
+    {quickLinks.map(({ href, label }) => (
+      <li key={href}>
+        <Link href={href} className={styles['footer__links-item']}>
+          {label}
+        </Link>
+      </li>
+    ))}
+  </ul>
+));
+
+QuickLinks.displayName = 'QuickLinks';
+
+const WorkingHours = memo(() => (
+  <ul>
+    {workingHours.map(({ days, hours }) => (
+      <li key={days} className={styles['footer__hours-item']}>
+        <span>{days}:</span>
+        <span>{hours}</span>
+      </li>
+    ))}
+    <li className={styles['footer__hours-note']}>
+      <span>* Последний вход за 1 час до закрытия</span>
+    </li>
+  </ul>
+));
+
+WorkingHours.displayName = 'WorkingHours';
+
+const ContactInfo = memo(() => (
+  <ul>
+    {contactInfo.map(({ icon: Icon, text }) => (
+      <li key={text} className={styles['footer__contact-item']}>
+        <Icon className={styles['footer__contact-item-icon']} />
+        <span>{text}</span>
+      </li>
+    ))}
+  </ul>
+));
+
+ContactInfo.displayName = 'ContactInfo';
+
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-
-  const footerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   return (
     <footer className={styles.footer}>
@@ -35,100 +118,28 @@ const Footer = () => {
           viewport={{ once: true }}
           variants={footerVariants}
         >
-          {/* О нас */}
           <motion.div variants={itemVariants}>
             <h3 className={styles['footer__column-title']}>Зоопарк</h3>
             <p className={styles['footer__column-text']}>
               Почувствуйте магию дикой природы в уникальной и интерактивной среде. 
               Наша миссия - обучать, сохранять и вдохновлять.
             </p>
-            <div className={styles.footer__social}>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-                <FaFacebook className={styles['footer__social-link']} />
-              </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-                <FaTwitter className={styles['footer__social-link']} />
-              </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                <FaInstagram className={styles['footer__social-link']} />
-              </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
-                <FaYoutube className={styles['footer__social-link']} />
-              </a>
-            </div>
+            <SocialLinks />
           </motion.div>
 
-          {/* Быстрые ссылки */}
           <motion.div variants={itemVariants}>
             <h3 className={styles['footer__column-title']}>Разделы</h3>
-            <ul className={styles['footer__links-list']}>
-              <li>
-                <Link href="/" className={styles['footer__links-item']}>
-                  Главная
-                </Link>
-              </li>
-              <li>
-                <Link href="/animals" className={styles['footer__links-item']}>
-                  Животные
-                </Link>
-              </li>
-              <li>
-                <Link href="/tickets" className={styles['footer__links-item']}>
-                  Билеты
-                </Link>
-              </li>
-              <li>
-                <Link href="/events" className={styles['footer__links-item']}>
-                  События
-                </Link>
-              </li>
-              <li>
-                <Link href="/location" className={styles['footer__links-item']}>
-                  Как добраться
-                </Link>
-              </li>
-            </ul>
+            <QuickLinks />
           </motion.div>
 
-          {/* Часы работы */}
           <motion.div variants={itemVariants}>
             <h3 className={styles['footer__column-title']}>Часы работы</h3>
-            <ul>
-              <li className={styles['footer__hours-item']}>
-                <span>Понедельник - Пятница:</span>
-                <span>9:00 - 18:00</span>
-              </li>
-              <li className={styles['footer__hours-item']}>
-                <span>Суббота:</span>
-                <span>9:00 - 19:00</span>
-              </li>
-              <li className={styles['footer__hours-item']}>
-                <span>Воскресенье:</span>
-                <span>10:00 - 19:00</span>
-              </li>
-              <li className={styles['footer__hours-note']}>
-                <span>* Последний вход за 1 час до закрытия</span>
-              </li>
-            </ul>
+            <WorkingHours />
           </motion.div>
 
-          {/* Контакты */}
           <motion.div variants={itemVariants}>
             <h3 className={styles['footer__column-title']}>Контакты</h3>
-            <ul>
-              <li className={styles['footer__contact-item']}>
-                <FaMapMarkerAlt className={styles['footer__contact-item-icon']} />
-                <span>ул. Зоологическая, 123, г. Москва, 123456</span>
-              </li>
-              <li className={styles['footer__contact-item']}>
-                <FaPhone className={styles['footer__contact-item-icon']} />
-                <span>+7 (123) 456-7890</span>
-              </li>
-              <li className={styles['footer__contact-item']}>
-                <FaEnvelope className={styles['footer__contact-item-icon']} />
-                <span>info@zoopark.ru</span>
-              </li>
-            </ul>
+            <ContactInfo />
           </motion.div>
         </motion.div>
 
@@ -146,4 +157,4 @@ const Footer = () => {
   );
 };
 
-export default Footer; 
+export default memo(Footer); 

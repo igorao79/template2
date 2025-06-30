@@ -5,35 +5,38 @@
   "homepage": "https://igorao79.github.io/template2",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run generate-icons && npm run optimize-images && next build",
     "start": "next start",
     "lint": "next lint",
+    "optimize-images": "node scripts/optimize-images.js",
+    "generate-icons": "node scripts/generate-icons.js",
     "deploy": "next build && echo.> out/.nojekyll && gh-pages -d out -t"
   },
   "dependencies": {
     "@dotlottie/react-player": "^1.6.19",
-    "@types/leaflet": "^1.9.19",
+    "@types/leaflet": "^1.9.8",
     "critters": "^0.0.23",
-    "framer-motion": "^12.16.0",
+    "framer-motion": "^10.18.0",
     "leaflet": "^1.9.4",
-    "next": "15.3.3",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-icons": "^5.5.0",
+    "next": "14.1.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-icons": "^5.0.1",
     "react-intersection-observer": "^9.16.0",
-    "sass": "^1.89.1"
+    "sass": "^1.70.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@next/bundle-analyzer": "^15.3.3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "15.3.3",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.1.0",
     "gh-pages": "^6.1.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "sharp": "^0.33.2"
   }
 }

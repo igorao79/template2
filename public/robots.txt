@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://igorao79.github.io/zoo/sitemap.xml 

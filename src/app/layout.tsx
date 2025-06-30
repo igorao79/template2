@@ -1,20 +1,27 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata, Viewport } from 'next';
 import "@/styles/globals.scss";
-import Providers from '@/app/providers';
+import Providers from './providers';
 import { Montserrat } from 'next/font/google';
 import { getAssetPath } from '@/app/utils/paths';
 import Header from '@/app/components/layout/Header';
+import FontPreload from './components/FontPreload';
 
-const montserrat = Montserrat({ subsets: ['latin', 'cyrillic'] });
+const montserrat = Montserrat({
+  subsets: ['latin', 'cyrillic'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
-  title: "Зоопарк - Удивительный мир животных",
-  description: "Добро пожаловать в самый интерактивный и увлекательный зоопарк. Познакомьтесь с удивительными животными, посетите наши события и проведите время с семьей!",
+  title: 'Зоопарк',
+  description: 'Добро пожаловать в наш зоопарк',
+  manifest: '/manifest.json',
   icons: {
-    icon: getAssetPath('/fav.ico'),
+    icon: '/fav.ico'
   },
-  manifest: getAssetPath('/manifest.json'),
-  authors: [{ name: 'Зоопарк' }],
+  other: {
+    'format-detection': 'telephone=no',
+  },
   keywords: ['зоопарк', 'животные', 'развлечения', 'семейный отдых', 'билеты в зоопарк'],
   robots: 'index, follow',
   metadataBase: new URL(process.env.NODE_ENV === 'production' 
@@ -34,23 +41,22 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  themeColor: '#1E5128',
+  themeColor: '#ffffff',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="ru">
+    <html lang="ru" className={montserrat.className}>
       <head>
-        <meta name="mobile-web-app-capable" content="yes" />
+        <FontPreload />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" />
       </head>
-      <body className={montserrat.className}>
+      <body>
         <Providers>
           <Header />
           {children}

@@ -2,13 +2,8 @@
 
 import { useReducer, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FaShoppingCart, FaTimes, FaArrowRight, FaArrowLeft } from 'react-icons/fa';
 import { 
-  FaShoppingCart, 
-  FaPlus, 
-  FaMinus, 
-  FaTimes, 
-  FaArrowRight, 
-  FaArrowLeft, 
   FaCheck, 
   FaCreditCard, 
   FaPaypal, 
@@ -283,7 +278,6 @@ const CartModal = () => {
     enter: (direction: number) => {
       const isMobile = windowWidth <= 768;
       return {
-        position: 'absolute',
         x: isMobile ? 0 : direction > 0 ? '100%' : '-100%',
         opacity: 0.2,
         scale: 0.95,
@@ -291,7 +285,6 @@ const CartModal = () => {
       }
     },
     center: {
-      position: 'relative',
       x: 0,
       opacity: 1,
       scale: 1,
@@ -305,7 +298,6 @@ const CartModal = () => {
     exit: (direction: number) => {
       const isMobile = windowWidth <= 768;
       return {
-        position: 'absolute',
         x: isMobile ? 0 : direction < 0 ? '100%' : '-100%',
         opacity: 0.2,
         scale: 0.95,
@@ -363,22 +355,22 @@ const CartModal = () => {
       {cartItems && cartItems.length > 0 ? (
         <div className={styles.cart__items_list}>
           {cartItems.map((item) => (
-            <div key={item.ticket.id} className={styles.cart__product_row}>
+            <div key={item.id} className={styles.cart__product_row}>
               <div className={styles.cart__product_icon}>
-                {renderTicketIcon(item.ticket.iconType)}
+                {renderTicketIcon(item.iconType)}
               </div>
               <div className={styles.cart__product_info}>
                 <div className={styles.cart__product_name}>
-                  {item.ticket.name}
+                  {item.name}
                 </div>
                 <div className={styles.cart__product_price}>
-                  {formatPrice(item.ticket.price)} / шт.
+                  {formatPrice(item.price)} / шт.
                 </div>
               </div>
               <div className={styles.cart__counter}>
                 <button 
                   className={styles.cart__counter_btn}
-                  onClick={() => updateQuantity(item.ticket.id, item.quantity - 1)}
+                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
                   aria-label="Уменьшить количество"
                 >
                   -
@@ -386,18 +378,18 @@ const CartModal = () => {
                 <div className={styles.cart__counter_value}>{item.quantity}</div>
                 <button 
                   className={styles.cart__counter_btn}
-                  onClick={() => updateQuantity(item.ticket.id, item.quantity + 1)}
+                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
                   aria-label="Увеличить количество"
                 >
                   +
                 </button>
               </div>
               <div className={styles.cart__product_total}>
-                {formatPrice(item.ticket.price * item.quantity)}
+                {formatPrice(item.price * item.quantity)}
               </div>
               <button 
                 className={styles.cart__product_remove}
-                onClick={() => removeFromCart(item.ticket.id)}
+                onClick={() => removeFromCart(item.id)}
                 aria-label="Удалить из корзины"
               >
                 <FaTrash />

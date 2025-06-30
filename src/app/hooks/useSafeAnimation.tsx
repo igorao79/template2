@@ -3,23 +3,26 @@
 import { useState, useEffect } from 'react';
 import { useAnimation } from '../context/AnimationContext';
 
+interface AnimationState {
+  canAnimate: boolean;
+  isLoading: boolean;
+  hasScrolled: boolean;
+}
+
 export const useSafeAnimation = () => {
   const [isMounted, setIsMounted] = useState(false);
-  const [animationState, setAnimationState] = useState({
+  const [animationState, setAnimationState] = useState<AnimationState>({
     canAnimate: false,
     isLoading: true,
-    animationsEnabled: false
+    hasScrolled: false
   });
+
+  const animation = useAnimation();
 
   useEffect(() => {
     setIsMounted(true);
-    try {
-      const state = useAnimation();
-      setAnimationState(state);
-    } catch (error) {
-      console.warn('AnimationContext not available yet');
-    }
-  }, []);
+    setAnimationState(animation);
+  }, [animation]);
 
   return {
     ...animationState,
