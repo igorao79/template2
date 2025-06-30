@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { FaVolumeUp, FaStar, FaRedo } from 'react-icons/fa';
+import { getAssetPath } from '@/app/utils/paths';
 import styles from './AnimalSoundsGame.module.scss';
 
 // Данные о животных и их звуках
@@ -10,45 +12,45 @@ const animals = [
   {
     id: 1,
     name: 'Лев',
+    icon: '🦁',
     sound: '/sounds/lion.mp3',
-    image: '/images/lion.webp',
-    icon: '🦁'
+    image: getAssetPath('/images/lion.webp'),
   },
   {
     id: 2,
     name: 'Слон',
+    icon: '🐘',
     sound: '/sounds/elephant.mp3',
-    image: '/images/elephant.webp',
-    icon: '🐘'
+    image: getAssetPath('/images/elephant.webp'),
   },
   {
     id: 3,
     name: 'Обезьяна',
+    icon: '🐒',
     sound: '/sounds/monkey.mp3',
-    image: '/images/monkey.webp',
-    icon: '🐵'
+    image: getAssetPath('/images/monkey.webp'),
   },
   {
     id: 4,
     name: 'Тигр',
+    icon: '🐯',
     sound: '/sounds/tiger.mp3',
-    image: '/images/tiger.webp',
-    icon: '🐯'
+    image: getAssetPath('/images/tiger.webp'),
   },
   {
     id: 5,
     name: 'Жираф',
+    icon: '🦒',
     sound: '/sounds/giraffe.mp3',
-    image: '/images/giraffe.webp',
-    icon: '🦒'
+    image: getAssetPath('/images/giraffe.webp'),
   },
   {
     id: 6,
     name: 'Волк',
+    icon: '🐺',
     sound: '/sounds/wolf.mp3',
-    image: '/images/wolf.webp',
-    icon: '🐺'
-  }
+    image: getAssetPath('/images/wolf.webp'),
+  },
 ];
 
 const AnimalSoundsGame = () => {
@@ -287,9 +289,11 @@ const AnimalSoundsGame = () => {
                   onClick={() => checkAnimal(animal.id)}
                 >
                   <div className={styles.game__image_container}>
-                    <img 
+                    <Image 
                       src={animal.image} 
                       alt={animal.name} 
+                      width={300}
+                      height={200}
                       className={styles.game__image}
                     />
                     <div className={styles.game__overlay}></div>

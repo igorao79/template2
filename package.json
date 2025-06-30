@@ -4,16 +4,18 @@
   "private": true,
   "homepage": "https://igorao79.github.io/template2",
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "deploy": "next build && touch out/.nojekyll && gh-pages -d out -t true"
+    "deploy": "next build && echo.> out/.nojekyll && gh-pages -d out -t"
   },
   "dependencies": {
     "@dotlottie/react-player": "^1.6.19",
+    "@types/leaflet": "^1.9.19",
     "critters": "^0.0.23",
     "framer-motion": "^12.16.0",
+    "leaflet": "^1.9.4",
     "next": "15.3.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

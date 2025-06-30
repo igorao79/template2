@@ -2,73 +2,88 @@
 
 import { useState, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaTicketAlt, FaChevronRight, FaShoppingCart } from 'react-icons/fa';
+import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaTicketAlt, FaShoppingCart } from 'react-icons/fa';
 import Image from 'next/image';
+import { getAssetPath } from '@/app/utils/paths';
 import styles from './EventsCalendar.module.scss';
 import { useCart } from '@/app/context/CartContext';
 import { useAnimation } from '../../../context/AnimationContext';
+import Arrow from '@/app/components/ui/Arrow';
 
-const events = [
+type Event = {
+  id: number;
+  title: string;
+  date: string;
+  time: string;
+  description: string;
+  image: string;
+  duration: string;
+  location: string;
+  price: number;
+  category: string;
+};
+
+const events: Event[] = [
   {
     id: 1,
-    title: 'Кормление хищников',
-    description: 'Увлекательное зрелище, когда наши сотрудники кормят тигров, львов и других хищников. Вы сможете увидеть их естественное поведение.',
-    date: '2023-06-15',
-    time: '12:00',
-    location: 'Павильон хищников',
-    image: '/images/events/feed_lions.webp',
-    category: 'feeding',
-    price: 300,
-    ticketType: 'event'
+    title: 'Кормление львов',
+    date: '2024-03-15',
+    time: '11:00',
+    description: 'Наблюдайте за кормлением наших величественных львов и узнайте больше об их рационе и поведении.',
+    image: getAssetPath('/images/events/feed_lions.webp'),
+    duration: '30 минут',
+    location: 'Вольер львов',
+    price: 200,
+    category: 'feeding'
   },
   {
     id: 2,
     title: 'Шоу дельфинов',
-    description: 'Захватывающее представление с участием наших талантливых дельфинов. Трюки, музыка и веселье для всей семьи!',
-    date: '2023-06-16',
-    time: '14:00',
+    date: '2024-03-15',
+    time: '13:00',
+    description: 'Увлекательное представление с участием наших талантливых дельфинов. Трюки, игры и много веселья!',
+    image: getAssetPath('/images/events/dolphin_show.webp'),
+    duration: '45 минут',
     location: 'Дельфинарий',
-    image: '/images/events/dolphin_show.webp',
-    category: 'show',
     price: 500,
-    ticketType: 'event'
+    category: 'show'
   },
   {
     id: 3,
-    title: 'Лекция о рептилиях',
-    description: 'Познавательная лекция о жизни и привычках рептилий. Вы сможете узнать интересные факты и даже подержать некоторых безопасных рептилий.',
-    date: '2023-06-17',
-    time: '15:30',
-    location: 'Образовательный центр',
-    image: '/images/events/reptiles_zoo.webp',
-    category: 'lecture',
-    price: 200,
-    ticketType: 'event'
+    title: 'Мир рептилий',
+    date: '2024-03-15',
+    time: '15:00',
+    description: 'Познакомьтесь с удивительными рептилиями нашего зоопарка. Узнайте интересные факты об их жизни.',
+    image: getAssetPath('/images/events/reptiles_zoo.webp'),
+    duration: '40 минут',
+    location: 'Террариум',
+    price: 300,
+    category: 'lecture'
   },
   {
     id: 4,
     title: 'Контактный зоопарк',
-    description: 'Возможность для детей и взрослых погладить и покормить домашних животных под присмотром наших специалистов.',
-    date: '2023-06-18',
-    time: '10:00 - 18:00',
+    date: '2024-03-15',
+    time: '16:30',
+    description: 'Погладьте и покормите дружелюбных животных в нашем контактном зоопарке.',
+    image: getAssetPath('/images/events/contact_zoo.webp'),
+    duration: '60 минут',
     location: 'Детская зона',
-    image: '/images/events/contact_zoo.webp',
-    category: 'activity',
     price: 400,
-    ticketType: 'event'
+    category: 'activity'
   },
   {
     id: 5,
     title: 'Ночь в зоопарке',
-    description: 'Уникальная возможность увидеть, как ведут себя животные ночью. Экскурсия с фонариками и опытным гидом.',
-    date: '2023-06-20',
-    time: '21:00',
-    location: 'Главный вход',
-    image: '/images/events/night_at_zoo.webp',
-    category: 'special',
-    price: 800,
-    ticketType: 'event'
-  }
+    date: '2024-03-15',
+    time: '20:00',
+    description: 'Уникальная возможность увидеть ночную жизнь обитателей зоопарка. Экскурсия при свете фонарей.',
+    image: getAssetPath('/images/events/night_at_zoo.webp'),
+    duration: '120 минут',
+    location: 'Весь зоопарк',
+    price: 1000,
+    category: 'special'
+  },
 ];
 
 const categories = [
@@ -117,11 +132,11 @@ const EventsCalendar = () => {
     }
   };
 
-  const handleAddToCart = (event: typeof events[0]) => {
+  const handleAddToCart = (event: Event) => {
     addToCart({
       id: event.id + 1000, // Уникальный ID для событий
       name: `Билет на: ${event.title}`,
-      price: event.price,
+      price: event.price, // Теперь price уже число
       description: `${new Date(event.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}, ${event.time}`,
       type: 'event' as 'adult' | 'child' | 'family' | 'senior', // Тип для билетов на события
       iconType: 'ticket'
@@ -257,7 +272,7 @@ const EventsCalendar = () => {
                     onClick={handleScrollToTickets}
                   >
                     <span>Перейти к билетам</span>
-                    <FaChevronRight />
+                    <Arrow size={20} className={styles.events__arrow} />
                   </button>
                 </div>
               </div>

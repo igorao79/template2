@@ -8,8 +8,7 @@
   width: 100%;
   z-index: $z-index-fixed;
   transition: all 0.3s ease;
-  background-color: #008060f2;
-  
+  background-color: transparent;
   
   &--scrolled {
     background-color: rgba($primary-color, 0.95);
@@ -33,6 +32,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
   }
 
   &__logo {
@@ -46,7 +46,7 @@
     z-index: $z-index-dropdown;
     position: relative;
     margin-right: $spacing-lg;
-    
+
     &:hover {
       color: $secondary-color;
     }
@@ -98,7 +98,7 @@
     }
 
     &--active {
-      color: $light-color;
+      color: $secondary-color;
       
       &::after {
         content: '';
@@ -112,12 +112,8 @@
         transform-origin: left;
         transition: transform 0.3s ease;
       }
-      
-      &:not(:hover)::after {
-        transform: scaleX(1);
-      }
     }
-    
+
     &:not(.header__nav-item--active)::after {
       content: '';
       position: absolute;
@@ -186,6 +182,7 @@
     transition: $transition-base;
     z-index: $z-index-dropdown;
     position: relative;
+    padding: $spacing-xs;
 
     @media (min-width: $breakpoint-md) {
       display: none;
@@ -193,68 +190,69 @@
   }
 
   &__mobile-menu {
-    position: absolute;
-    top: 100%;
+    position: fixed;
+    top: 0;
     left: 0;
     width: 100%;
-    background-color: #008060f2;
-    box-shadow: $shadow-md;
-    padding: $spacing-md 0;
-    z-index: $z-index-dropdown;
+    height: 100vh;
+    background-color: rgba($primary-color, 0.98);
     backdrop-filter: blur(8px);
+    padding: calc(#{$spacing-3xl} + 60px) $spacing-lg $spacing-lg;
+    z-index: calc(#{$z-index-fixed} - 1);
+    overflow-y: auto;
+    transform-origin: top;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+
+    @media (min-width: $breakpoint-md) {
+      display: none;
+    }
   }
 
   &__mobile-list {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: $spacing-md;
+    gap: $spacing-lg;
     list-style-type: none;
     padding: 0;
     margin: 0;
   }
 
   &__mobile-item {
+    font-size: $font-size-xl;
     font-weight: 500;
     color: $light-color;
     text-decoration: none;
     position: relative;
-    padding-bottom: $spacing-xs;
     transition: $transition-base;
+    padding: $spacing-sm;
+    border-radius: $border-radius-sm;
 
     &:hover {
-      color: $secondary-color;
+      background-color: rgba($light-color, 0.1);
     }
 
     &--active {
       color: $secondary-color;
-      
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: -2px;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background-color: $light-color;
-        transition: $transition-base;
-      }
+      background-color: rgba($secondary-color, 0.1);
     }
   }
 
   &__mobile_cart_btn {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: $spacing-sm;
     background-color: $secondary-color;
     border: none;
-    color: $primary-color;
-    padding: $spacing-sm $spacing-lg;
+    color: $light-color;
+    padding: $spacing-md;
     border-radius: $border-radius-md;
+    font-size: $font-size-lg;
     font-weight: 600;
     cursor: pointer;
     transition: $transition-base;
-    position: relative;
+    margin-top: $spacing-xl;
+    width: 100%;
 
     &:hover {
       background-color: color.adjust($secondary-color, $lightness: -10%);
@@ -262,27 +260,22 @@
   }
 
   &__mobile_cart_icon {
-    font-size: $font-size-md;
+    font-size: $font-size-xl;
   }
 
   &__mobile_cart_badge {
-    position: absolute;
-    top: -8px;
-    right: -8px;
     background-color: $primary-color;
     color: $light-color;
-    font-size: $font-size-xs;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size: $font-size-sm;
+    font-weight: 700;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: 9999px;
+    margin-left: $spacing-xs;
   }
 
   &__mobile_controls {
     display: flex;
     align-items: center;
-    margin-left: auto;
+    gap: $spacing-sm;
   }
 } 

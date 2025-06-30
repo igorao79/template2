@@ -6,12 +6,30 @@
 :root {
   --animation-enabled: 0;
   --smooth-scroll: 0;
+  --primary-color: #1E5128;
+  --secondary-color: #4CAF50;
+  --accent-color: #FFD700;
+  --background-color: #FFFFFF;
+  --text-color: #333333;
+  --light-color: #FFFFFF;
+  --dark-color: #000000;
+  --gray-color: #666666;
+  --error-color: #FF0000;
+  --success-color: #00FF00;
+  --warning-color: #FFA500;
+  --info-color: #00BFFF;
 }
 
 * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; // Высота хедера + отступ
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 html,
@@ -315,4 +333,22 @@ img {
   * {
     -webkit-tap-highlight-color: transparent;
   }
+}
+
+/* Стили для скроллбара */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--secondary-color);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: color.adjust(#4CAF50, $lightness: -10%);
 }

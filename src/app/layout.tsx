@@ -1,14 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import "../styles/globals.scss";
+import "@/styles/globals.scss";
 import Providers from '@/app/providers';
+import { Montserrat } from 'next/font/google';
+import { getAssetPath } from '@/app/utils/paths';
+import Header from '@/app/components/layout/Header';
+
+const montserrat = Montserrat({ subsets: ['latin', 'cyrillic'] });
 
 export const metadata: Metadata = {
   title: "Зоопарк - Удивительный мир животных",
   description: "Добро пожаловать в самый интерактивный и увлекательный зоопарк. Познакомьтесь с удивительными животными, посетите наши события и проведите время с семьей!",
   icons: {
-    icon: '/fav.ico',
+    icon: getAssetPath('/fav.ico'),
   },
-  manifest: '/manifest.json',
+  manifest: getAssetPath('/manifest.json'),
   authors: [{ name: 'Зоопарк' }],
   keywords: ['зоопарк', 'животные', 'развлечения', 'семейный отдых', 'билеты в зоопарк'],
   robots: 'index, follow',
@@ -20,7 +25,7 @@ export const metadata: Metadata = {
     title: 'Зоопарк - Удивительный мир животных',
     description: 'Добро пожаловать в самый интерактивный и увлекательный зоопарк',
     siteName: 'Зоопарк',
-    images: ['/images/og-image.jpg'],
+    images: [getAssetPath('/images/og-image.jpg')],
   }
 };
 
@@ -45,8 +50,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" />
       </head>
-      <body>
+      <body className={montserrat.className}>
         <Providers>
+          <Header />
           {children}
         </Providers>
       </body>

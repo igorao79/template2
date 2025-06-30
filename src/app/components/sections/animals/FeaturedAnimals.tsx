@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { FaArrowRight } from 'react-icons/fa';
 import styles from './FeaturedAnimals.module.scss';
 
@@ -104,9 +105,10 @@ const FeaturedAnimals = () => {
               onMouseLeave={() => setHoveredId(null)}
             >
               <div className={styles['featured__image-container']}>
-                <img 
+                <Image 
                   src={animal.image} 
                   alt={animal.name} 
+                  fill
                   className={styles.featured__image}
                 />
                 <div className={styles['featured__image-overlay']}></div>
@@ -118,7 +120,13 @@ const FeaturedAnimals = () => {
                 <p className={styles.featured__text}>{animal.description}</p>
                 <div className={styles.featured__footer}>
                   <div className={`${styles.featured__icon} ${animal.animationClass}`}>
-                    <img src={`/images/${animal.iconName}-icon.svg`} alt={animal.name} className="w-full h-full" />
+                    <Image 
+                      src={`/images/${animal.iconName}-icon.svg`} 
+                      alt={animal.name} 
+                      width={48}
+                      height={48}
+                      className="w-full h-full" 
+                    />
                   </div>
                   <Link
                     href={`/animals/${animal.id}`}

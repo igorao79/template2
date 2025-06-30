@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { FaArrowRight } from 'react-icons/fa';
+import { getAssetPath } from '@/app/utils/paths';
 
 // Sample data for featured animals
 const featuredAnimals = [
@@ -12,7 +14,7 @@ const featuredAnimals = [
     name: 'African Elephant',
     category: 'Mammal',
     description: 'The world\'s largest land animal with distinctive long trunks and large ears.',
-    image: '/images/elephant-card.jpg',
+    image: getAssetPath('/images/elephant-card.jpg'),
     animationClass: 'animate-elephant',
   },
   {
@@ -20,7 +22,7 @@ const featuredAnimals = [
     name: 'Bengal Tiger',
     category: 'Big Cat',
     description: 'A majestic big cat known for its orange coat with black stripes and incredible strength.',
-    image: '/images/tiger-card.jpg',
+    image: getAssetPath('/images/tiger-card.jpg'),
     animationClass: 'animate-pulse',
   },
   {
@@ -28,7 +30,7 @@ const featuredAnimals = [
     name: 'Giraffe',
     category: 'Mammal',
     description: 'The tallest living terrestrial animal with long necks and distinctive spotted patterns.',
-    image: '/images/giraffe-card.jpg',
+    image: getAssetPath('/images/giraffe-card.jpg'),
     animationClass: 'animate-float',
   },
   {
@@ -36,7 +38,7 @@ const featuredAnimals = [
     name: 'Ring-tailed Lemur',
     category: 'Primate',
     description: 'Known for its distinctive black and white ringed tail and large eyes.',
-    image: '/images/lemur-card.jpg',
+    image: getAssetPath('/images/lemur-card.jpg'),
     animationClass: 'animate-wiggle',
   },
 ];
@@ -99,10 +101,11 @@ const FeaturedAnimals = () => {
               onMouseLeave={() => setHoveredId(null)}
             >
               <div className="relative h-56 overflow-hidden">
-                <img 
+                <Image 
                   src={animal.image} 
                   alt={animal.name} 
-                  className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+                  fill
+                  className="object-cover transition-transform duration-700 hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-dark-color/70 to-transparent"></div>
                 <div className="absolute bottom-4 left-4 text-light-color">
@@ -115,7 +118,13 @@ const FeaturedAnimals = () => {
                 <p className="text-dark-color mb-4">{animal.description}</p>
                 <div className="flex justify-between items-center">
                   <div className={`w-12 h-12 ${animal.animationClass}`}>
-                    <img src={`/images/${animal.name.toLowerCase().replace(' ', '-')}-icon.svg`} alt={animal.name} className="w-full h-full" />
+                    <Image 
+                      src={getAssetPath(`/images/${animal.name.toLowerCase().replace(' ', '-')}-icon.svg`)}
+                      alt={animal.name} 
+                      width={48}
+                      height={48}
+                      className="w-full h-full" 
+                    />
                   </div>
                   <Link
                     href={`/animals/${animal.id}`}
@@ -147,4 +156,4 @@ const FeaturedAnimals = () => {
   );
 };
 
-export default FeaturedAnimals; 
+export default FeaturedAnimals;

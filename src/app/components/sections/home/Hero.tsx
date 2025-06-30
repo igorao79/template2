@@ -2,19 +2,17 @@
 
 import { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { getAssetPath } from '@/app/utils/paths';
 import styles from './Hero.module.scss';
-import { useAnimation } from '@/app/context/AnimationContext';
+import Arrow from '@/app/components/ui/Arrow';
 
 const Hero = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { canAnimate, hasScrolled } = useAnimation();
 
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.addEventListener('loadeddata', () => {
-        if (videoRef.current) {
-          videoRef.current.play();
-        }
+      videoRef.current.play().catch(() => {
+        // Игнорируем ошибку автовоспроизведения
       });
     }
   }, []);
@@ -22,17 +20,37 @@ const Hero = () => {
   const scrollToAnimals = (e: React.MouseEvent) => {
     e.preventDefault();
     const animalsSection = document.getElementById('animals');
-    animalsSection?.scrollIntoView({ behavior: 'smooth' });
+    if (animalsSection) {
+      const header = document.querySelector('header');
+      const headerHeight = header ? header.offsetHeight : 0;
+      const elementPosition = animalsSection.getBoundingClientRect().top + window.scrollY;
+      const offsetPosition = elementPosition - headerHeight;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
   };
   
   const scrollToTickets = (e: React.MouseEvent) => {
     e.preventDefault();
     const ticketsSection = document.getElementById('tickets');
-    ticketsSection?.scrollIntoView({ behavior: 'smooth' });
+    if (ticketsSection) {
+      const header = document.querySelector('header');
+      const headerHeight = header ? header.offsetHeight : 0;
+      const elementPosition = ticketsSection.getBoundingClientRect().top + window.scrollY;
+      const offsetPosition = elementPosition - headerHeight;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
   };
 
   return (
-    <section className={styles.hero}>
+    <section className={styles.hero} id="home">
       <div className={styles.hero__background}>
         <video 
           ref={videoRef}
@@ -41,9 +59,9 @@ const Hero = () => {
           muted
           loop
           playsInline
-          poster="./images/hero-bg.webp"
+          poster={getAssetPath('/images/hero-bg.webp')}
         >
-          <source src="./video.mp4" type="video/mp4" />
+          <source src={getAssetPath('/video.mp4')} type="video/mp4" />
         </video>
         <div className={styles.hero__overlay}></div>
       </div>
@@ -51,8 +69,8 @@ const Hero = () => {
       <div className={styles.hero__content}>
         <motion.h1 
           className={styles.hero__title}
-          initial={{ opacity: 0, y: -20 }}
-          animate={canAnimate && !hasScrolled ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
           Добро пожаловать в <span className={styles.hero__title_accent}>Зоопарк</span>
@@ -60,9 +78,9 @@ const Hero = () => {
         
         <motion.p 
           className={styles.hero__description}
-          initial={{ opacity: 0 }}
-          animate={canAnimate && !hasScrolled ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
         >
           Откройте для себя удивительный мир животных и незабываемые приключения для всей семьи.
         </motion.p>
@@ -70,8 +88,8 @@ const Hero = () => {
         <motion.div
           className={styles.hero__buttons}
           initial={{ opacity: 0, y: 20 }}
-          animate={canAnimate && !hasScrolled ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ delay: 0.5, duration: 0.8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
         >
           <a 
             href="#tickets" 
@@ -93,26 +111,12 @@ const Hero = () => {
       <motion.div 
         className={styles.hero__scroll}
         initial={{ opacity: 0 }}
-        animate={canAnimate && !hasScrolled ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ delay: 0.5, duration: 0.5 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.9, duration: 0.5 }}
         onClick={scrollToAnimals}
       >
         <div className={styles.hero__scroll_icon}>
-          <svg 
-            width="30" 
-            height="30" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path 
-              d="M12 5V19M12 19L19 12M12 19L5 12" 
-              stroke="white" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-            />
-          </svg>
+          <Arrow color="white" size={30} />
         </div>
       </motion.div>
     </section>
