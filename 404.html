@@ -4,20 +4,27 @@
     <meta charset="utf-8">
     <title>Зоопарк</title>
     <script type="text/javascript">
-      // Single Page Apps для GitHub Pages
-      // https://github.com/rafgraph/spa-github-pages
+      // Single Page Apps для GitHub Pages - исправленная версия
       var pathSegmentsToKeep = 1;
       var l = window.location;
-      l.replace(
-        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + 
-        '/?/' +
-        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
-        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-        l.hash
-      );
+      
+      // Проверяем, что мы не находимся уже в цикле
+      if (!l.search.includes('~and~') && l.pathname !== '/template2/') {
+        l.replace(
+          l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+          l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + 
+          '/?/' +
+          l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+          (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+          l.hash
+        );
+      }
     </script>
   </head>
   <body>
+    <div style="text-align: center; font-family: Arial, sans-serif; margin-top: 50px;">
+      <h1>Перенаправление...</h1>
+      <p>Если перенаправление не произошло автоматически, <a href="/template2/">нажмите здесь</a></p>
+    </div>
   </body>
 </html> 
