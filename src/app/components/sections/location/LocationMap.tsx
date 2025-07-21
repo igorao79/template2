@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useRef, memo } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { FaBus, FaSubway, FaCar, FaPhone, FaClock, FaEnvelope } from 'react-icons/fa';
 import styles from './LocationMap.module.scss';
 import { useAnimation } from '../../../context/AnimationContext';
+import { useInView } from '../../../hooks/useInView';
 import type { Map as LeafletMap } from 'leaflet';
 
 // Импортируем иконки маркеров
@@ -46,6 +47,18 @@ const containerVariants = {
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+} as const;
+
+const mapVariants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { 
+    opacity: 1, 
+    scale: 1, 
+    transition: { 
+      duration: 0.6,
+      ease: "easeOut"
+    } 
+  },
 } as const;
 
 const ContactInfo = memo(() => (
@@ -93,11 +106,9 @@ const LocationMap = () => {
   const mapInitialized = useRef<boolean>(false);
   const { canAnimate } = useAnimation();
   
-  const headerRef = useRef(null);
-  const transportRef = useRef(null);
-  
-  const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
-  const transportInView = useInView(transportRef, { once: true, amount: 0.1 });
+  const { ref: headerRef, isInView: headerInView } = useInView({ threshold: 0.3 });
+  const { ref: mapRef, isInView: mapInView } = useInView({ threshold: 0.3 });
+  const { ref: transportRef, isInView: transportInView } = useInView({ threshold: 0.1 });
 
   useEffect(() => {
     if (!mapContainerRef.current || mapInitialized.current) return;
@@ -150,7 +161,6 @@ const LocationMap = () => {
           className={styles.location__header}
           initial={{ opacity: 0, y: -20 }}
           animate={(canAnimate && headerInView) ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
-          viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
           <h2 className={styles.location__title}>Как добраться</h2>
@@ -161,7 +171,13 @@ const LocationMap = () => {
         </motion.div>
 
         <div className={styles.location__content}>
-          <div className={styles.location__map_container}>
+          <motion.div 
+            ref={mapRef}
+            className={styles.location__map_container}
+            variants={mapVariants}
+            initial="hidden"
+            animate={(canAnimate && mapInView) ? "visible" : "hidden"}
+          >
             <div 
               ref={mapContainerRef}
               className={styles.location__map}
@@ -172,7 +188,7 @@ const LocationMap = () => {
               <p>г. Москва, ул. Зоологическая, д. 13</p>
               <ContactInfo />
             </div>
-          </div>
+          </motion.div>
           
           <motion.div 
             ref={transportRef}
@@ -180,10 +196,8 @@ const LocationMap = () => {
             variants={containerVariants}
             initial="hidden"
             animate={(canAnimate && transportInView) ? "visible" : "hidden"}
-            viewport={{ once: true }}
           >
-            <h3 className={styles.location__transport_title}>Транспорт</h3>
-            
+            <h3 className={styles.location__transport_title}>Способы проезда</h3>
             <div className={styles.location__transport_grid}>
               {transportOptions.map((option) => (
                 <TransportCard key={option.id} option={option} />

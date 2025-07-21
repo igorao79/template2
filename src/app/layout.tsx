@@ -15,10 +15,25 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: 'Зоопарк',
   description: 'Добро пожаловать в наш зоопарк',
-  manifest: '/manifest.json',
-  icons: {
-    icon: '/fav.ico'
-  },
+  manifest: getAssetPath('/manifest.json'),
+  icons: [
+    {
+      rel: 'icon',
+      url: getAssetPath('/fav.ico'),
+      sizes: '32x32',
+    },
+    {
+      rel: 'icon',
+      url: getAssetPath('/icon-192.png'),
+      sizes: '192x192',
+      type: 'image/png',
+    },
+    {
+      rel: 'apple-touch-icon',
+      url: getAssetPath('/icon-192.png'),
+      sizes: '192x192',
+    },
+  ],
   other: {
     'format-detection': 'telephone=no',
   },
@@ -55,6 +70,29 @@ export default function RootLayout({
         <FontPreload />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="icon" href={getAssetPath('/fav.ico')} sizes="32x32" />
+        <link rel="icon" href={getAssetPath('/icon-192.png')} type="image/png" sizes="192x192" />
+        <link rel="apple-touch-icon" href={getAssetPath('/icon-192.png')} sizes="192x192" />
+        
+        {/* SPA GitHub Pages Support - исправленная версия */}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            (function(l) {
+              if (l.search && l.search.length > 1 && l.search[1] === '/') {
+                var decoded = l.search.slice(1).split('&').map(function(s) { 
+                  return s.replace(/~and~/g, '&')
+                }).join('?');
+                // Убираем только первый '/' из decoded
+                if (decoded.startsWith('/')) {
+                  decoded = decoded.slice(1);
+                }
+                // Исправляем путь и очищаем search для предотвращения циклов
+                var newPath = l.pathname + (decoded ? '/' + decoded : '');
+                window.history.replaceState(null, null, newPath + l.hash);
+              }
+            }(window.location))
+          `
+        }} />
       </head>
       <body>
         <Providers>

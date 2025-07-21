@@ -5,12 +5,14 @@
   "homepage": "https://igorao79.github.io/template2",
   "scripts": {
     "dev": "next dev",
-    "build": "npm run generate-icons && npm run optimize-images && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "optimize-images": "node scripts/optimize-images.js",
-    "generate-icons": "node scripts/generate-icons.js",
-    "deploy": "next build && echo.> out/.nojekyll && gh-pages -d out -t"
+    "deploy": "node scripts/deploy.mjs",
+    "redeploy": "npm run clean-dev && npm run deploy",
+    "optimize-images": "node scripts/optimize-images.mjs",
+    "clean-dev": "node scripts/clean-dev.mjs",
+    "generate-icons": "node scripts/generate-icons.js"
   },
   "dependencies": {
     "@dotlottie/react-player": "^1.6.19",
@@ -35,8 +37,8 @@
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
     "gh-pages": "^6.1.1",
+    "sharp": "^0.33.5",
     "tailwindcss": "^4",
-    "typescript": "^5",
-    "sharp": "^0.33.2"
+    "typescript": "^5"
   }
 }

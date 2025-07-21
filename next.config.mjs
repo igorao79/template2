@@ -1,13 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    formats: ['image/webp', 'image/avif'],
-    remotePatterns: [],
-    dangerouslyAllowSVG: true,
-    contentDispositionType: 'attachment',
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     unoptimized: true,
   },
   sassOptions: {
@@ -16,16 +9,42 @@ const nextConfig = {
   },
   output: 'export',
   distDir: 'out',
-  basePath: '/zoo',
-  assetPrefix: '/zoo/',
+  basePath: '/template2',
+  assetPrefix: '/template2/',
   trailingSlash: true,
-  compress: true,
   reactStrictMode: true,
-  productionBrowserSourceMaps: false,
+  
+  // Экспорт для GitHub Pages
+  skipTrailingSlashRedirect: true,
+  
+  // Оптимизация для статического экспорта
   experimental: {
-    optimizeCss: true,
-    optimizePackageImports: ['react-icons'],
-  }
+    optimizePackageImports: ['framer-motion', 'leaflet'],
+  },
+  
+  // Оптимизация сборки
+  swcMinify: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  
+  // Webpack оптимизации
+  webpack: (config, { dev, isServer }) => {
+    if (!dev && !isServer) {
+      // Минимизация bundle размера
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+        },
+      };
+    }
+    return config;
+  },
 };
 
 export default nextConfig; 

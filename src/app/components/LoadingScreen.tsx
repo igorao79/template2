@@ -11,6 +11,15 @@ const LoadingScreen = () => {
   useEffect(() => {
     document.body.style.opacity = '1';
     
+    // Блокируем скролл во время загрузки
+    if (isLoading) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.height = '100vh';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+    }
+    
     if (!isLoading && loaderRef.current) {
       loaderRef.current.classList.add(styles.fadeOut);
       
@@ -20,6 +29,14 @@ const LoadingScreen = () => {
 
       return () => clearTimeout(removeTimer);
     }
+
+    // Cleanup function для сброса стилей при размонтировании
+    return () => {
+      if (!isLoading) {
+        document.body.style.overflow = '';
+        document.body.style.height = '';
+      }
+    };
   }, [isLoading]);
 
   return (
