@@ -7,8 +7,10 @@
   left: 0;
   width: 100%;
   z-index: $z-index-fixed;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, padding 0.3s ease, box-shadow 0.3s ease;
   background-color: transparent;
+  padding-top: $spacing-md;
+  padding-bottom: $spacing-md;
   
   &--scrolled {
     background-color: rgba($primary-color, 0.95);
@@ -16,12 +18,6 @@
     box-shadow: $shadow-md;
     padding-top: $spacing-sm;
     padding-bottom: $spacing-sm;
-  }
-  
-  &--transparent {
-    background-color: transparent;
-    padding-top: $spacing-md;
-    padding-bottom: $spacing-md;
   }
 
   &__container {
@@ -80,16 +76,13 @@
     text-decoration: none;
     position: relative;
     padding-bottom: $spacing-xs;
+    color: $light-color;
 
-    &--scrolled {
-      color: $light-color;
-
-      &:hover {
-        color: $secondary-color;
-      }
+    &:hover {
+      color: $secondary-color;
     }
 
-    &--transparent {
+    &--scrolled {
       color: $light-color;
 
       &:hover {

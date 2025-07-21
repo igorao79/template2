@@ -1,4 +1,5 @@
 export function getAssetPath(path: string): string {
-  // basePath уже добавляется Next.js автоматически
-  return path;
+  // В production на GitHub Pages нужен префикс /template2
+  const basePath = process.env.NODE_ENV === 'production' ? '/template2' : '';
+  return `${basePath}${path}`;
 } 

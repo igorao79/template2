@@ -33,7 +33,7 @@ const Header = () => {
 
   return (
     <header 
-      className={`${styles.header} ${isScrolled ? styles['header--scrolled'] : styles['header--transparent']}`}
+      className={`${styles.header} ${isScrolled ? styles['header--scrolled'] : ''}`}
     >
       <div className={styles.header__container}>
         <a 
@@ -58,10 +58,7 @@ const Header = () => {
                   }}
                   className={`
                     ${styles['header__nav-item']} 
-                    ${isScrolled 
-                      ? styles['header__nav-item--scrolled'] 
-                      : styles['header__nav-item--transparent']
-                    }
+                    ${isScrolled ? styles['header__nav-item--scrolled'] : ''}
                     ${activeSection === link.id ? styles['header__nav-item--active'] : ''}
                   `}
                 >
