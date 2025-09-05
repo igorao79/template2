@@ -118,8 +118,10 @@ const CartModal = () => {
 
   // Отладка состояния корзины
   useEffect(() => {
-    console.log('CartModal: Количество элементов в корзине:', cartItems.length);
-    console.log('CartModal: Общая сумма:', totalPrice);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('CartModal: Количество элементов в корзине:', cartItems.length);
+      console.log('CartModal: Общая сумма:', totalPrice);
+    }
   }, [cartItems, totalPrice, isCartOpen]);
 
   // Генерация недоступных дат

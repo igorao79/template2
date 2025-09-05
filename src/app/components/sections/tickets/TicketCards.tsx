@@ -140,7 +140,9 @@ const TicketCards = () => {
   const gridInView = useInView(gridRef, { once: true, amount: 0.1 });
 
   const handleBuyTicket = useCallback((ticket: Ticket) => {
-    console.log('TicketCards: Добавление билета в корзину:', ticket.type);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('TicketCards: Добавление билета в корзину:', ticket.type);
+    }
     const cartItem = {
       id: ticket.id,
       name: ticket.type,
@@ -150,8 +152,10 @@ const TicketCards = () => {
       iconType: 'ticket' as const,
       quantity: 1
     };
-    
-    console.log('TicketCards: Данные билета для корзины:', cartItem);
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('TicketCards: Данные билета для корзины:', cartItem);
+    }
     addToCart(cartItem);
   }, [addToCart]);
 

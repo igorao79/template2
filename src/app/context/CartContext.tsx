@@ -68,12 +68,16 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         if (savedCart) {
           const parsedCart = JSON.parse(savedCart);
           if (Array.isArray(parsedCart) && parsedCart.length > 0) {
-            console.log('Загружены элементы корзины:', parsedCart.length);
+            if (process.env.NODE_ENV === 'development') {
+              console.log('Загружены элементы корзины:', parsedCart.length);
+            }
             setCartItems(parsedCart);
           }
         }
       } catch (error) {
-        console.error('Ошибка при загрузке корзины:', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Ошибка при загрузке корзины:', error);
+        }
         localStorage.removeItem('cart');
       } finally {
         setIsInitialized(true);
@@ -86,14 +90,18 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (isInitialized && cartItems.length > 0) {
       localStorage.setItem('cart', JSON.stringify(cartItems));
-      console.log('Сохранено элементов в корзине:', cartItems.length);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Сохранено элементов в корзине:', cartItems.length);
+      }
     }
   }, [cartItems, isInitialized]);
 
   const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
   const addToCart = (item: CartItem) => {
-    console.log('Добавление в корзину:', item.name, item.quantity);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Добавление в корзину:', item.name, item.quantity);
+    }
     setCartItems((prevItems) => {
       const existingItemIndex = prevItems.findIndex((i) => i.id === item.id);
       
@@ -113,7 +121,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const removeFromCart = (itemId: number) => {
-    console.log('Удаление из корзины ID:', itemId);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Удаление из корзины ID:', itemId);
+    }
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
   };
 
@@ -128,14 +138,18 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const clearCart = () => {
-    console.log('Очистка корзины');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Очистка корзины');
+    }
     setCartItems([]);
     localStorage.removeItem('cart');
   };
 
   const openCart = () => {
     setIsCartOpen(true);
-    console.log('Открытие корзины, элементов:', cartItems.length);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Открытие корзины, элементов:', cartItems.length);
+    }
   };
 
   const closeCart = () => {

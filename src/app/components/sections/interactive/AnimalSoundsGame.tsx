@@ -81,7 +81,9 @@ const AnimalSoundsGame = () => {
     
     setTimeout(() => {
       newAudio.play().catch(error => {
-        console.error('Ошибка воспроизведения звука:', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Ошибка воспроизведения звука:', error);
+        }
       });
     }, 500);
   };
@@ -129,7 +131,9 @@ const AnimalSoundsGame = () => {
     if (audio && currentSound !== null) {
       audio.currentTime = 0;
       audio.play().catch(error => {
-        console.error('Ошибка воспроизведения звука:', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Ошибка воспроизведения звука:', error);
+        }
       });
     }
   };
