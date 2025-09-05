@@ -15,23 +15,11 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: 'Зоопарк',
   description: 'Добро пожаловать в наш зоопарк',
-  manifest: getAssetPath('/manifest.json'),
   icons: [
     {
       rel: 'icon',
       url: getAssetPath('/fav.ico'),
       sizes: '32x32',
-    },
-    {
-      rel: 'icon',
-      url: getAssetPath('/icon-192.png'),
-      sizes: '192x192',
-      type: 'image/png',
-    },
-    {
-      rel: 'apple-touch-icon',
-      url: getAssetPath('/icon-192.png'),
-      sizes: '192x192',
     },
   ],
   other: {
@@ -71,8 +59,6 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="icon" href={getAssetPath('/fav.ico')} sizes="32x32" />
-        <link rel="icon" href={getAssetPath('/icon-192.png')} type="image/png" sizes="192x192" />
-        <link rel="apple-touch-icon" href={getAssetPath('/icon-192.png')} sizes="192x192" />
         
         {/* SPA GitHub Pages Support - исправленная версия */}
         <script dangerouslySetInnerHTML={{
